@@ -1,6 +1,10 @@
-from django.urls import path
+from django.urls import path, include
+from rest_framework.routers import DefaultRouter
 
+
+router = DefaultRouter()
+router.register(r'sort/products', basename='product-sort')
 
 urlpatterns = [
-    path("api", name='home')
+    path('api/', include(router.urls)),
 ]
