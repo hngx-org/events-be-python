@@ -1,6 +1,8 @@
 from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from .models import Events
+from django.contrib.auth.models import Group
+from .serializers import userGroupsSerializer
 from .serializers import EventsSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -105,3 +107,8 @@ class EventDelView(generics.DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
         return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
+    
+
+class GroupUpdateAPIView(generics.UpdateAPIView):
+    queryset = Group.objects.all()
+    serializer = userGroupsSerializer

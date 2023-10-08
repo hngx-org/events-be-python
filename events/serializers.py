@@ -8,4 +8,9 @@ class EventsSerializer(serializers.ModelSerializer):
         model = Events
         fields = '__all__'
 
+
+class userGroupsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('id', 'name') 
     
