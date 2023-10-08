@@ -6,7 +6,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q 
-
+from django.shortcuts import get_object_or_404
+from users.models import CustomUser
 
 class CreateEventView(generics.CreateAPIView):
     queryset = Events.objects.all()
@@ -79,5 +80,25 @@ def update_event(request, format=None, event_id=None):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
+class CalenderView(generics.RetrieveAPIView):
+    permission_classes=[IsAuthenticated]
+    queryset= Events.objects.all()
+    def retrieve(self, request, *args, **kwargs):
+        events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user.name))
+        context={}
+        context['calenderDetail']=[{
+            'events_start':events.start_date,
+            'events_end': events.end_date,
+            'time_start': events.start_time,
+            'time_end':events.end_time
+        } for events in events]
+        return Response(context,status=status.HTTP_200_OK)
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+class EventDelView(generics.DestroyAPIView):
+    permission_classes=[IsAuthenticated]
+    queryset= Events.objects.all()
+    serializer_class=EventsSerializer
+    lookup_field='id'
+    def destroy(self, request, *args, **kwargs):
+        super().destroy(request, *args, **kwargs)
+        return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
