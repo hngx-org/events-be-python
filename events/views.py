@@ -15,6 +15,11 @@ class CreateEventView(CreateAPIView):
     serializer_class = EventsSerializer
 
 
+class CreatEventView(generics.CreateAPIView):
+    queryset = Events.objects.all()
+    serializer_class = EventsSerializer
+
+
 class EventsView(APIView):
     def get(self, request, format=None):
         """
