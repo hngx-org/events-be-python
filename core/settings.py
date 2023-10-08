@@ -50,6 +50,9 @@ INSTALLED_APPS = [
     'comments',
 ]
 
+SOCIALACCOUNT_AUTO_SIGNUP = True
+
+
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.AllowAny',
@@ -74,7 +77,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',                          # <<< newly added line
+    'corsheaders.middleware.CorsMiddleware',                          
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -110,6 +113,12 @@ DATABASES = {
 
 
 AUTH_USER_MODEL = 'users.CustomUser'
+
+AUTHENTICATION_BACKENDS = (
+    # ...
+    'allauth.account.auth_backends.AuthenticationBackend',
+    # ...
+)
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
