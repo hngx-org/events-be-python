@@ -2,8 +2,8 @@ from django.shortcuts import render,redirect
 from rest_framework import generics
 from rest_framework.response import Response
 from django.views import View
-from .serializers import UserSerializer
-from .models import CustomUser
+from .serializers import UserSerializer,Groupserializer,User_GroupsSerializer
+from .models import CustomUser,Group
 from authlib.integrations.django_client import OAuth
 from django.contrib.auth import get_user_model
 from rest_framework import status
@@ -106,3 +106,30 @@ class AuthView(APIView):
         response = Response(data, status=200)
 
         return response
+    
+
+class CreateGroupApiView(generics.ListCreateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = Groupserializer
+    permission_classes = []
+    
+    def post(self, request, *args, **kwargs):
+        serializer = Groupserializer()
+        if serializer.is_valid():
+            serializer.save(admin=self.request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+    
+
+
+class UpdateGroupApiView(generics.RetrieveUpdateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = Groupserializer
+    permission_classes = []
+    lookup_field = 'pk'
+
+
+class GetUserGroupsApiView(generics.ListAPIView):
+    queryset= Group.objects.all()
+    serializer_class = User_GroupsSerializer()
+    permission_classes = []
