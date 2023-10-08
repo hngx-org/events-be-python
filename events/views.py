@@ -1,9 +1,23 @@
+
 from rest_framework import status, generics
 from .models import Events
 from .serializers import EventsSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.db.models import Q 
+from .serializers import EventsSerializer
+from . models import *
+from rest_framework.generics import CreateAPIView
+
+
+class CreateEventView(CreateAPIView):
+    queryset = Events.objects.all()
+    serializer_class = EventsSerializer
+
+
+class CreatEventView(generics.CreateAPIView):
+    queryset = Events.objects.all()
+    serializer_class = EventsSerializer
 
 
 class EventsView(APIView):
