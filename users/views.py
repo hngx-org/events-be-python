@@ -82,7 +82,7 @@ class AuthView(APIView):
         picture = token.get('userinfo', {}).get('picture')
         access_token = token.get('access_token', {})
         id = token.get('userinfo', {}).get('sub')
-        # access_token = token.get('access_token', {})
+        access_token = token.get('access_token', {})
 
         try:
             user = CustomUser.objects.get(email=email)
