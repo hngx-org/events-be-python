@@ -108,7 +108,3 @@ class EventDelView(generics.DestroyAPIView):
         super().destroy(request, *args, **kwargs)
         return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
     
-
-class GroupUpdateAPIView(generics.UpdateAPIView):
-    queryset = Group.objects.all()
-    serializer = userGroupsSerializer
