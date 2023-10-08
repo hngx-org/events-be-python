@@ -1,13 +1,15 @@
-from django.shortcuts import render
+from rest_framework import status
 from .models import Events
 from .serializers import EventsSerializer
-from django.http import JsonResponse
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
 
-def get_all_events(request):
-    """
-    Provides a get method handler that returns all events.
-    """
-    queryset = Events.objects.all()
-    serializer_class = EventsSerializer
-    return JsonResponse(serializer_class.data, safe=False)
+class EventsView(APIView):
+    def get(self, request, format=None):
+        """
+        Provides a get method handler that returns all events.
+        """
+        queryset = Events.objects.all()
+        serializer = EventsSerializer(queryset, many=True)
+        return Response(serializer.data)
