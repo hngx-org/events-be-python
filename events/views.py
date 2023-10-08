@@ -1,11 +1,19 @@
 from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from .models import Events
-from .serializers import EventsSerializer
+from django.contrib.auth.models import Group
+from .serializers import userGroupsSerializer
+from .serializers import EventsSerializer, Calenderserializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q 
+from django.shortcuts import get_object_or_404
+from users.models import CustomUser
+
+class CreateEventView(generics.CreateAPIView):
+    queryset = Events.objects.all()
+    serializer_class = EventsSerializer
 
 
 class EventsView(APIView):
@@ -54,6 +62,9 @@ class SearchEventView(generics.ListAPIView):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+
 
 @api_view(['PUT', 'PATCH'])
 def update_event(request, format=None, event_id=None):
@@ -74,5 +85,25 @@ def update_event(request, format=None, event_id=None):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
+class CalenderView(generics.RetrieveAPIView):
+    permission_classes=[IsAuthenticated]
+    queryset= Events.objects.all()
+    def retrieve(self, request, *args, **kwargs):
+        events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user.name))
+        serializer = Calenderserializer(events, many=True)
+        context = {'calenderDetail': serializer.data}
+        return Response(context, status=status.HTTP_200_OK)
 
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+class EventDelView(generics.DestroyAPIView):
+    permission_classes=[IsAuthenticated]
+    queryset= Events.objects.all()
+    serializer_class=EventsSerializer
+    lookup_field='id'
+    def destroy(self, request, *args, **kwargs):
+        super().destroy(request, *args, **kwargs)
+        return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
+    
+
+class GroupUpdateAPIView(generics.UpdateAPIView):
+    queryset = Group.objects.all()
+    serializer = userGroupsSerializer
