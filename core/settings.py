@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 import os
 from dotenv import load_dotenv
 
+
 from pathlib import Path
 
 load_dotenv()
@@ -43,9 +44,27 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'users',
     'events',
+    'drf_yasg',
     "corsheaders",
     "rest_framework",
+
 ]
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.AllowAny',
+    ],
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.FormParser',
+        'rest_framework.parsers.MultiPartParser',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+    ],
+
+}
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -144,4 +163,10 @@ AUTHLIB_OAUTH_CLIENTS = {
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
