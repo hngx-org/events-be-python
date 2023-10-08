@@ -1,6 +1,7 @@
 from datetime import datetime
 
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 
@@ -29,4 +30,4 @@ def create_comment(request, event_id, *args, **kwargs):
             "comment": request["comment"],
             "event_id": event_id,
         }
-        return Response(comment.data)
+        return Response(data)
