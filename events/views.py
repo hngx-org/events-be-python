@@ -1,7 +1,7 @@
 from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from .models import Events
-from .serializers import EventsSerializer
+from .serializers import EventsSerializer, Calenderserializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -85,14 +85,10 @@ class CalenderView(generics.RetrieveAPIView):
     queryset= Events.objects.all()
     def retrieve(self, request, *args, **kwargs):
         events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user.name))
-        context={}
-        context['calenderDetail']=[{
-            'events_start':events.start_date,
-            'events_end': events.end_date,
-            'time_start': events.start_time,
-            'time_end':events.end_time
-        } for events in events]
-        return Response(context,status=status.HTTP_200_OK)
+        serializer = Calenderserializer(events, many=True)
+        
+        context = {'calenderDetail': serializer.data}
+        return Response(context, status=status.HTTP_200_OK)
 
 class EventDelView(generics.DestroyAPIView):
     permission_classes=[IsAuthenticated]
