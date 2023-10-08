@@ -8,6 +8,11 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q 
 
 
+class CreateEventView(generics.CreateAPIView):
+    queryset = Events.objects.all()
+    serializer_class = EventsSerializer
+
+
 class EventsView(APIView):
     def get(self, request, format=None):
         """
