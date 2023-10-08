@@ -30,7 +30,7 @@ SECRET_KEY = 'django-insecure-7ambc$gr*q#fz_nqis$&6p)0r8e&-&&ai-h^*x$-abiq7@2bsl
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["*"]
 
 
 # Application definition
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     "corsheaders",
     "rest_framework",
-
+    'comments',
 ]
 
 REST_FRAMEWORK = {
@@ -145,7 +145,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+STATICFILE_DIRS = [
+    BASE_DIR / 'static'
+    ]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -154,8 +158,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHLIB_OAUTH_CLIENTS = {
     'google': {
-        'client_id': os.getenv('CLIENT_ID'),
-        'client_secret': os.getenv('CLIENT_SECRET'),
+        'client_id': "188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com",
+        'client_secret': "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",
     }
 }
 
@@ -164,9 +168,5 @@ AUTHLIB_OAUTH_CLIENTS = {
 CORS_ORIGIN_ALLOW_ALL = True
 
 
-CORS_ORIGIN_ALLOW_ALL = True
-
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-

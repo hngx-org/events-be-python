@@ -12,3 +12,8 @@ class Calenderserializer(serializers.ModelSerializer):
     class Meta:
         model=Events
         fields = ['start_date', 'end_date', 'start_time', 'end_time']
+class userGroupsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ('id', 'name') 
+    
