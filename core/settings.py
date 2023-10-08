@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'users',
     'events',
     'comments',
+    'drf_yasg',
 ]
 
 MIDDLEWARE = [
