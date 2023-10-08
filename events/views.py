@@ -90,7 +90,7 @@ def update_event(request, format=None, event_id=None):
 class CalenderView(generics.RetrieveAPIView):
     queryset= Events.objects.all()
     def retrieve(self, request, *args, **kwargs):
-        events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user.name))
+        events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user))
         serializer = Calenderserializer(events, many=True)
         context = {'calenderDetail': serializer.data}
         return Response(context, status=status.HTTP_200_OK)
