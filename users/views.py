@@ -16,6 +16,7 @@ from itsdangerous import URLSafeTimedSerializer
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
+from rest_framework.decorators import api_view
 
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
@@ -116,7 +117,7 @@ class CreateGroupApiView(generics.ListCreateAPIView):
     serializer_class = Groupserializer
     
     def post(self, request, *args, **kwargs):
-        serializer = Groupserializer()
+        serializer = Groupserializer(data=request.data)
         if serializer.is_valid():
             
             serializer.save(admin=self.request.user)
@@ -138,17 +139,15 @@ class UpdateGroupApiView(generics.UpdateAPIView):
     
 
 
-class GetUserGroupsApiView(generics.ListAPIView):
-    queryset= User_Groups.objects.all()
-    serializer_class = User_GroupsSerializer
-    # def get(self, request, *args, **kwargs):
-    #     user = request.user
-    #     if user:
-    #         user_groups = User_Groups.objects.filter(user=user).select_related('group')      
-    #         groups = [user_group.group for user_group in user_groups]
-      
-    #         response_data = {
-    #         'groups': groups,
-    #         }
-    #         return Response(response_data, status=status.HTTP_200_OK)
-    #     return Response({"error": "user does not exist"},status=status.HTTP_404_NOT_FOUND)
+@api_view(["GET"]) 
+def GetUserGroupsApiView(request, *args, **kwargs):
+    method = request.method
+
+    if method == "GET":
+        user = request.user
+        if user.is_authenticated:
+            # Filter groups based on the user who created them
+            created_groups = Group.objects.filter(admin=user)
+            serializer = Groupserializer(created_groups, many=True)
+            return Response(serializer.data)
+        
