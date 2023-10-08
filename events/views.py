@@ -86,7 +86,6 @@ class CalenderView(generics.RetrieveAPIView):
     def retrieve(self, request, *args, **kwargs):
         events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user.name))
         serializer = Calenderserializer(events, many=True)
-        
         context = {'calenderDetail': serializer.data}
         return Response(context, status=status.HTTP_200_OK)
 
