@@ -55,6 +55,7 @@ class AuthView(APIView):
         email = data.get("email")
         picture = data.get("photoUrl")
         id = data.get("id")
+        print(id)
         
         try:
             user = CustomUser.objects.get(id=id)
@@ -82,12 +83,12 @@ class AuthView(APIView):
         access_token = token.get('access_token', {})
         id = token.get('userinfo', {}).get('sub')
         # access_token = token.get('access_token', {})
-        
+
         try:
             user = CustomUser.objects.get(email=email)
         except CustomUser.DoesNotExist:
-            user = CustomUser.objects.create(email=email, id=str(id), name=name, avatar=picture)
-        
+            user = CustomUser.objects.create(email=email, user_id=str(id), name=name, avatar=picture)
+            
         # Set the is_active status in Redis
         cache_key = f'user_active_status:{user.id}'
         cache.set(cache_key, True)

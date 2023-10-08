@@ -1,8 +1,11 @@
+from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from .models import Events
 
 
-class EventSerialize(serializers.ModelSerializer):
+class EventsSerializer(serializers.ModelSerializer):
     class Meta:
-        model=Events
-        fields='__all__'
+        model = Events
+        fields = '__all__'
+
+    
