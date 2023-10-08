@@ -47,9 +47,7 @@ INSTALLED_APPS = [
     'drf_yasg',
     "corsheaders",
     "rest_framework",
-    "comments",
-    'allauth',
-
+'comments',
 ]
 
 SOCIALACCOUNT_AUTO_SIGNUP = True
