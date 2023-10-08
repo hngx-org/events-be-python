@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from rest_framework import generics
 from rest_framework.response import Response
 from django.views import View
-from .serializers import UserSerializer,Groupserializer
+from .serializers import UserSerializer,Groupserializer, User_GroupsSerializer
 from .models import CustomUser,Group, User_Groups
 from authlib.integrations.django_client import OAuth
 from django.contrib.auth import get_user_model
@@ -85,7 +85,7 @@ class AuthView(APIView):
         picture = token.get('userinfo', {}).get('picture')
         access_token = token.get('access_token', {})
         id = token.get('userinfo', {}).get('sub')
-        # access_token = token.get('access_token', {})
+        access_token = token.get('access_token', {})
 
         try:
             user = CustomUser.objects.get(email=email)
@@ -115,11 +115,11 @@ class AuthView(APIView):
 class CreateGroupApiView(generics.ListCreateAPIView):
     queryset = Group.objects.all()
     serializer_class = Groupserializer
-    permission_classes = [IsAuthenticated]
     
     def post(self, request, *args, **kwargs):
         serializer = Groupserializer(data=request.data)
         if serializer.is_valid():
+            
             serializer.save(admin=self.request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
@@ -129,13 +129,11 @@ class CreateGroupApiView(generics.ListCreateAPIView):
 class RetrieveGroupApiView(generics.RetrieveAPIView):
     queryset = Group.objects.all()
     serializer_class = Groupserializer
-    permission_classes = [IsAuthenticated]
     lookup_field = 'pk'
 
 class UpdateGroupApiView(generics.UpdateAPIView):
     queryset = Group.objects.all()
     serializer_class = Groupserializer
-    permission_classes = [IsAuthenticated]
     lookup_field = 'pk'
 
     

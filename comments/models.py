@@ -5,6 +5,10 @@ from django.db import models
 
 from events.models import Events
 from users.models import CustomUser
+import uuid
+
+def generateUUID():
+    return str(uuid.uuid4())
 
 
 # Create your models here.

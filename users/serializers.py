@@ -13,4 +13,10 @@ class Groupserializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['pk','group_name','admin','created_at','updated_at']
+        
+
+class User_GroupsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User_Groups
+        fields = '__all__'
 
