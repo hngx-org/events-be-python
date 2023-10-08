@@ -2,8 +2,8 @@ from django.shortcuts import render,redirect
 from rest_framework import generics
 from rest_framework.response import Response
 from django.views import View
-from .serializers import UserSerializer
-from .models import CustomUser
+from .serializers import UserSerializer,Groupserializer
+from .models import CustomUser,Group, User_Groups
 from authlib.integrations.django_client import OAuth
 from django.contrib.auth import get_user_model
 from rest_framework import status
@@ -14,6 +14,8 @@ from rest_framework.views import APIView
 from django.core.cache import cache
 from itsdangerous import URLSafeTimedSerializer
 from rest_framework import permissions
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q
 
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
@@ -107,3 +109,49 @@ class AuthView(APIView):
         response = Response(data, status=200)
 
         return response
+    
+
+class CreateGroupApiView(generics.ListCreateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = Groupserializer
+    permission_classes = [IsAuthenticated]
+    
+    def post(self, request, *args, **kwargs):
+        serializer = Groupserializer()
+        if serializer.is_valid():
+            serializer.save(admin=self.request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+    
+
+
+class RetrieveGroupApiView(generics.RetrieveAPIView):
+    queryset = Group.objects.all()
+    serializer_class = Groupserializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'pk'
+
+class UpdateGroupApiView(generics.UpdateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = Groupserializer
+    permission_classes = [IsAuthenticated]
+    lookup_field = 'pk'
+
+    
+
+
+class GetUserGroupsApiView(generics.ListAPIView):
+    queryset= Group.objects.all()
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, *args, **kwargs):
+        user = request.user
+        if user:
+            user_groups = User_Groups.objects.filter(user=user).select_related('group')      
+            groups = [user_group.group for user_group in user_groups]
+      
+            response_data = {
+            'groups': groups,
+            }
+            return Response(response_data, status=status.HTTP_200_OK)
+        return Response({"error": "user does not exist"},status=status.HTTP_404_NOT_FOUND)
