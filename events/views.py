@@ -9,7 +9,7 @@ from rest_framework.response import Response
 from .serializers import EventSerialize
 from django.shortcuts import get_object_or_404
 class CalenderView(generics.RetrieveAPIView):
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     queryset= Events.objects.all()
     def retrieve(self, request, *args, **kwargs):
         events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user.name))
