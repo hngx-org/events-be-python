@@ -51,11 +51,11 @@ INSTALLED_APPS = [
     "allauth",
 ]
 
-SOCIALACCOUNT_AUTO_SIGNUP = True
+# SOCIALACCOUNT_AUTO_SIGNUP = True
 
-AUTHENTICATION_BACKENDS = [
-    'django.contrib.auth.backends.ModelBackend',
-]
+# AUTHENTICATION_BACKENDS = [
+#     'django.contrib.auth.backends.ModelBackend',
+# ]
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [

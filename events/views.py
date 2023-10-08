@@ -6,7 +6,7 @@ from .serializers import userGroupsSerializer
 from .serializers import EventsSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+#from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q 
 from django.shortcuts import get_object_or_404
 from users.models import CustomUser
@@ -44,7 +44,7 @@ class SearchEventView(generics.ListAPIView):
     Search events by keywords and return events associated with the authenticated user.
     """
     serializer_class = EventsSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         keywords = self.request.query_params.get('keywords', '')
@@ -86,10 +86,10 @@ def update_event(request, format=None, event_id=None):
         serializer.save()
         return Response(serializer.data)
 class CalenderView(generics.RetrieveAPIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     queryset= Events.objects.all()
     def retrieve(self, request, *args, **kwargs):
-        events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user.name))
+        events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user))
         context={}
         context['calenderDetail']=[{
             'events_start':events.start_date,
@@ -100,7 +100,7 @@ class CalenderView(generics.RetrieveAPIView):
         return Response(context,status=status.HTTP_200_OK)
 
 class EventDelView(generics.DestroyAPIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     queryset= Events.objects.all()
     serializer_class=EventsSerializer
     lookup_field='id'
