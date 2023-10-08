@@ -3,7 +3,7 @@ from rest_framework.decorators import api_view
 from .models import Events
 from django.contrib.auth.models import Group
 from .serializers import userGroupsSerializer
-from .serializers import EventsSerializer, Calenderserializer
+from .serializers import EventsSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 #from rest_framework.permissions import IsAuthenticated
@@ -44,6 +44,7 @@ class SearchEventView(generics.ListAPIView):
     Search events by keywords and return events associated with the authenticated user.
     """
     serializer_class = EventsSerializer
+    # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         keywords = self.request.query_params.get('keywords', '')
@@ -84,19 +85,22 @@ def update_event(request, format=None, event_id=None):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
-    
-    
-    
 class CalenderView(generics.RetrieveAPIView):
+    # permission_classes=[IsAuthenticated]
     queryset= Events.objects.all()
     def retrieve(self, request, *args, **kwargs):
-        events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user.name))
-        serializer = Calenderserializer(events, many=True)
-        context = {'calenderDetail': serializer.data}
-        return Response(context, status=status.HTTP_200_OK)
+        events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user))
+        context={}
+        context['calenderDetail']=[{
+            'events_start':events.start_date,
+            'events_end': events.end_date,
+            'time_start': events.start_time,
+            'time_end':events.end_time
+        } for events in events]
+        return Response(context,status=status.HTTP_200_OK)
 
 class EventDelView(generics.DestroyAPIView):
-    
+    # permission_classes=[IsAuthenticated]
     queryset= Events.objects.all()
     serializer_class=EventsSerializer
     lookup_field='id'
@@ -104,4 +108,3 @@ class EventDelView(generics.DestroyAPIView):
         super().destroy(request, *args, **kwargs)
         return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
     
-
