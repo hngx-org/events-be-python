@@ -5,8 +5,9 @@ from . import views
 
 
 urlpatterns = [
-    path('events/get/', views.EventsView.as_view(),name="Get_Events"),
-
-
-    path('events/<str:event_id>/', views.update_event, name='update_event'),
+    # Define URL patterns for your views
+    path('events/', views.EventsView.as_view(), name='events-list'),
+    path('events/<int:event_id>/', views.getEvent.as_view(), name='event-detail'),
+    path('events/search/', views.SearchEventView.as_view(), name='event-search'),
+    path('events/<int:event_id>/update/', views.update_event, name='event-update'),
 ]

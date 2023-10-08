@@ -1,9 +1,11 @@
-from rest_framework import status
+from rest_framework import status, generics
 from rest_framework.decorators import api_view
 from .models import Events
 from .serializers import EventsSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q 
 
 
 class EventsView(APIView):
@@ -14,7 +16,44 @@ class EventsView(APIView):
         queryset = Events.objects.all()
         serializer = EventsSerializer(queryset, many=True)
         return Response(serializer.data)
+    
+    
+class getEvent(APIView):
+    """Handles getting event by id"""
+    def get(self, request, event_id):
 
+        try:
+            event = Events.objects.get(id=event_id)
+            serilizer = EventsSerializer(event, context={'request': request})
+            return Response(serilizer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": "event does not exist"}, status=status.
+            HTTP_404_NOT_FOUND)
+
+
+class SearchEventView(generics.ListAPIView):
+    """
+    Search events by keywords and return events associated with the authenticated user.
+    """
+    serializer_class = EventsSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        keywords = self.request.query_params.get('keywords', '')
+
+        # Case-insensitive search for events containing keywords in title or description
+        search_query = Q(title__icontains=keywords) | Q(description__icontains=keywords)
+
+        # Filter events by the authenticated user
+        user = self.request.user
+        user_events = Events.objects.filter(search_query, user=user)
+
+        return user_events
+
+    def list(self, request, *args, **kwargs):
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(['PUT', 'PATCH'])
 def update_event(request, format=None, event_id=None):
