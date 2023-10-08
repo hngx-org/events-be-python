@@ -49,6 +49,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',                          # <<< newly added line
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -125,3 +126,8 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# GOOGLE_CLIENT_ID = <CLIENT_ID>
+# SOCIAL_SECRET = <SOCIAL_SECRET
+
+CORS_ORIGIN_ALLOW_ALL = True
