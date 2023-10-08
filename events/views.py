@@ -60,6 +60,9 @@ class SearchEventView(generics.ListAPIView):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    
+
 
 @api_view(['PUT', 'PATCH'])
 def update_event(request, format=None, event_id=None):
