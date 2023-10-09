@@ -171,8 +171,8 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTHLIB_OAUTH_CLIENTS = {
     'google': {
-        'client_id': "188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com",
-        'client_secret': "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",
+        'client_id': "552452171826-fepna48o3qapjmri8bif9tr8c45l050r.apps.googleusercontent.com",
+        'client_secret': "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",
     }
 }
 

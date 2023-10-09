@@ -18,6 +18,8 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from rest_framework.decorators import api_view
 
+from django.contrib.auth import login
+
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 oauth = OAuth()
@@ -67,6 +69,8 @@ class AuthView(APIView):
             
         serializer = URLSafeTimedSerializer(AuthenticationMiddleware.secret_key)
         session_token = serializer.dumps(str(user.id))
+
+        
             
         data = {
             "success": True,

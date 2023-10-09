@@ -14,7 +14,7 @@ from users.authentication import AuthenticationMiddleware, IsAuthenticatedUser
 # Create your views here.
 @api_view(["POST"])
 @authentication_classes(AuthenticationMiddleware)
-@permission_classes(IsAuthenticatedUser)
+#@permission_classes(IsAuthenticatedUser)
 def create_comment(request, event_id, *args, **kwargs):
     event = get_object_or_404(Events, pk=event_id)
     current_time = datetime.utcnow()
