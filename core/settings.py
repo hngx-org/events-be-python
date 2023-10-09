@@ -49,6 +49,8 @@ INSTALLED_APPS = [
     "rest_framework",
     'comments',
     "allauth",
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist'
 ]
 
 # SOCIALACCOUNT_AUTO_SIGNUP = True
@@ -57,20 +59,27 @@ INSTALLED_APPS = [
 #     'django.contrib.auth.backends.ModelBackend',
 # ]
 
-REST_FRAMEWORK = {
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.AllowAny',
-    ],
-    'DEFAULT_PARSER_CLASSES': [
-        'rest_framework.parsers.JSONParser',
-        'rest_framework.parsers.FormParser',
-        'rest_framework.parsers.MultiPartParser',
-    ],
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.SessionAuthentication',
-    ],
+# REST_FRAMEWORK = {
+#     'DEFAULT_PERMISSION_CLASSES': [
+#         'rest_framework.permissions.AllowAny',
+#     ],
+#     'DEFAULT_PARSER_CLASSES': [
+#         'rest_framework.parsers.JSONParser',
+#         'rest_framework.parsers.FormParser',
+#         'rest_framework.parsers.MultiPartParser',
+#     ],
+#     'DEFAULT_AUTHENTICATION_CLASSES': [
+#         'rest_framework.authentication.BasicAuthentication',
+#         'rest_framework.authentication.SessionAuthentication',
+#     ],
 
+# }
+
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        
+    ),
 }
 
 MIDDLEWARE = [
@@ -120,7 +129,8 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTHENTICATION_BACKENDS = (
     # ...
-    'allauth.account.auth_backends.AuthenticationBackend',
+    #'allauth.account.auth_backends.AuthenticationBackend',
+    'django.contrib.auth.backends.ModelBackend',
     # ...
 )
 
@@ -177,6 +187,22 @@ AUTHLIB_OAUTH_CLIENTS = {
 }
 
 
+
+SWAGGER_SETTINGS = {
+    "USE_SESSION_AUTH": False,
+    "relative_paths": False,
+    "DISPLAY_OPERATION_ID": False,
+    "SECURITY_DEFINITIONS": {
+        "Basic": {"type": "basic"},
+        "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"},
+    },
+}
+#settings for simple-jwt
+from datetime import timedelta
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=10),#determines access token expiration time
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=10),#determines refresh token expiration time
+}
 
 CORS_ORIGIN_ALLOW_ALL = True
 

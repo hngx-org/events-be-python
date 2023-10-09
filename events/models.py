@@ -1,5 +1,5 @@
 from django.db import models
-from users.models import CustomUser
+from users.models import CustomUser, Group
 import uuid
 
 # Create your models here.
@@ -9,6 +9,7 @@ class Events(models.Model):
     description = models.TextField(blank=True, null=True)
     location = models.TextField(blank=True, null=True)
     creator = models.ForeignKey(CustomUser, models.CASCADE, blank=True, null=True)
+    group = models.ForeignKey(Group, models.CASCADE, blank=True, null=True)
     start_date = models.DateField(blank=True, null=True)
     end_date = models.DateField(blank=True, null=True)
     start_time = models.TimeField(blank=True, null=True)
