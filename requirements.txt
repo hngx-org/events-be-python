@@ -74,3 +74,5 @@ typing_extensions==4.8.0
 tzdata==2023.3
 uritemplate==4.1.1
 urllib3==2.0.6
+python-decouple==3.8
+psycopg2-binary==2.9.9
