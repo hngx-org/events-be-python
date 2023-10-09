@@ -136,6 +136,12 @@ class UpdateGroupApiView(generics.UpdateAPIView):
     serializer_class = Groupserializer
     lookup_field = 'pk'
 
+    def perform_update(self, serializer):
+        user = self.request.user
+        group = self.get_object()  
+        if group.admin == user:
+            serializer.save()
+
     
 
 
