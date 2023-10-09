@@ -125,7 +125,6 @@ class CreateGroupApiView(generics.ListCreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
     
 
-
 class RetrieveGroupApiView(generics.RetrieveAPIView):
     queryset = Group.objects.all()
     serializer_class = Groupserializer
@@ -141,9 +140,10 @@ class UpdateGroupApiView(generics.UpdateAPIView):
         group = self.get_object()  
         if group.admin == user:
             serializer.save()
-
+            return Response({"message": "group updated successfully."}, status=status.HTTP_200_OK)
+        else:
+            return Response({"error": "user can't be found."}, status=status.HTTP_401_UNAUTHORIZED)
     
-
 
 @api_view(["GET"]) 
 def GetUserGroupsApiView(request, *args, **kwargs):
