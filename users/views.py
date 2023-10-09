@@ -151,3 +151,7 @@ def GetUserGroupsApiView(request, *args, **kwargs):
             serializer = Groupserializer(created_groups, many=True)
             return Response(serializer.data)
         
+class editUserGroup(generics.UpdateAPIView):
+    queryset = Group.objects.all()
+    serializer = User_GroupsSerializer
+        
