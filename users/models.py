@@ -1,5 +1,8 @@
 from django.db import models
 import uuid
+
+from django.contrib.auth.models import BaseUserManager
+
 class CustomUser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     user_id = models.CharField(max_length=255, blank=True, null=True)
@@ -22,5 +25,4 @@ class CustomUser(models.Model):
 
     def __str__(self):
         return self.name
-
     

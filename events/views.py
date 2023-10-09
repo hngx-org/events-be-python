@@ -101,7 +101,7 @@ class EventDelView(generics.DestroyAPIView):
     lookup_field='id'
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
-        return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
+        return Response({"message": "Event deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
     
 
 class GroupUpdateAPIView(generics.UpdateAPIView):
