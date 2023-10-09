@@ -11,15 +11,83 @@ from django.urls import reverse
 import uuid
 from .authentication import AuthenticationMiddleware, IsAuthenticatedUser
 from rest_framework.views import APIView
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.core.cache import cache
 from itsdangerous import URLSafeTimedSerializer
 from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.exceptions import AuthenticationFailed
 from django.db.models import Q
 from rest_framework.decorators import api_view
-
+from users.serializers import LoginSerializer, RegisterSerializer
 from django.contrib.auth import login
 
+
+
+class RegisterUser(generics.CreateAPIView):
+    """
+        Register new user and return the user the signup user up data, including sending an otp to email
+        address of the user for verifiication
+    """
+    permission_classes = []
+    queryset = CustomUser.objects.all()
+    serializer_class = RegisterSerializer
+    
+
+    def create(self, request, *args, **kwargs):
+        """OTP verification and validation"""
+        
+        serializer = RegisterSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        user_instance = serializer.save()
+        
+        # Get the serialized user data
+        
+        res = {"message": "Token sent!", "code": 200, "data": serializer.data}
+        return Response(res, status=status.HTTP_200_OK)
+class newLoginView(TokenObtainPairView):
+    serializer_class = LoginSerializer
+    permission_classes = ()
+    
+    def post(self, request, *args, **kwargs):
+        
+        serializer = self.get_serializer(data=request.data)
+        if not serializer.is_valid():
+            raise AuthenticationFailed('Invalid data. Check your email and password.')
+
+        try:
+            email = serializer.initial_data['email']
+            password = serializer.initial_data['password']
+        except:
+            raise AuthenticationFailed('Email and password required')
+
+        try:
+            
+            user = CustomUser.objects.get(email=email)
+            if not user.check_password(password):
+                raise AuthenticationFailed('Invalid email or password.')
+
+            
+        except CustomUser.DoesNotExist:
+            raise AuthenticationFailed('Invalid email or password.')
+
+        
+        try:
+            if serializer.is_valid():
+    
+                tokens = serializer.validated_data
+                custom_data = {
+                    'access': str(tokens['access']),
+                    'refresh': str(tokens['refresh']),
+                    'user_id': user.id,
+                }
+                return Response(custom_data, status=status.HTTP_200_OK)
+        except Exception as e:
+            print(str(e))
+        print("hek")
+        
+        
+        return Response({"serializer.errors":"hi"}, status=status.HTTP_400_BAD_REQUEST)
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 oauth = OAuth()

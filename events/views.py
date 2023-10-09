@@ -3,22 +3,31 @@ from rest_framework.decorators import api_view
 from .models import Events
 from django.contrib.auth.models import Group
 from .serializers import userGroupsSerializer
-from .serializers import EventsSerializer
+from .serializers import EventsSerializer, Calenderserializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 #from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q 
 from django.shortcuts import get_object_or_404
 from users.models import CustomUser
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 
 class CreateEventView(generics.CreateAPIView):
+    permission_classes = []
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
 
+    def post(self, request, *args, **kwargs):
+        serializer = EventsSerializer(data=request.data)
+        if serializer.is_valid():
+            
+            serializer.save(creator=self.request.user)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+
 
 class EventsView(APIView):
-    permission_classes = [IsAuthenticated]
+    permission_classes = []
     def get(self, request, format=None):
         """
         Provides a get method handler that returns all events.
@@ -46,25 +55,22 @@ class SearchEventView(generics.ListAPIView):
     """
     Search events by keywords and return events associated with the authenticated user.
     """
+    queryset = Events.objects.all()
     serializer_class = EventsSerializer
     # permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         keywords = self.request.query_params.get('keywords', '')
-
-        # Case-insensitive search for events containing keywords in title or description
-        search_query = Q(title__icontains=keywords) | Q(description__icontains=keywords)
-
-        # Filter events by the authenticated user
-        user = self.request.user
-        user_events = Events.objects.filter(search_query, user=user)
-
-        return user_events
-
+        #case insensitive search
+        print(keywords)
+        return self.queryset.filter(
+            Q(title__icontains=keywords) | Q(description__icontains=keywords)
+        )
     def list(self, request, *args, **kwargs):
         queryset = self.get_queryset()
         serializer = self.get_serializer(queryset, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
     
     
 
@@ -91,17 +97,13 @@ def update_event(request, format=None, event_id=None):
 
 class CalenderView(generics.RetrieveAPIView):
     # permission_classes=[IsAuthenticated]
+
     queryset= Events.objects.all()
     def retrieve(self, request, *args, **kwargs):
-        events= Events.objects.filter(creator=get_object_or_404(CustomUser,name=request.user))
-        context={}
-        context['calenderDetail']=[{
-            'events_start':events.start_date,
-            'events_end': events.end_date,
-            'time_start': events.start_time,
-            'time_end':events.end_time
-        } for events in events]
-        return Response(context,status=status.HTTP_200_OK)
+        events= Events.objects.filter(creator=get_object_or_404(CustomUser,id=request.user.id))
+        serializer = Calenderserializer(events, many=True)
+        context = {'calenderDetail': serializer.data}
+        return Response(context, status=status.HTTP_200_OK)
 
 class EventDelView(generics.DestroyAPIView):
     # permission_classes=[IsAuthenticated]
