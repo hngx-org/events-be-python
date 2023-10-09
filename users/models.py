@@ -1,7 +1,9 @@
+from django.conf import settings
 from django.db import models
 import uuid
 class CustomUser(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    user_id = models.CharField(max_length=255, blank=True, null=True)
     name = models.CharField(max_length=225, blank=True, null=True)
     email = models.EmailField(unique=True)
     avatar = models.TextField(blank=True, null=True) #change to cloudinary later
@@ -22,4 +24,14 @@ class CustomUser(models.Model):
     def __str__(self):
         return self.name
 
+
+class Group(models.Model):
+    group_name = models.CharField(max_length=100)
+    admin = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='admin_groups')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now_add=True)
+
+class User_Groups(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group')
     
