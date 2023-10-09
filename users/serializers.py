@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import CustomUser,Group,User_Groups
+from .models import CustomUser,Group
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.decorators import parser_classes
 from rest_framework.parsers import JSONParser
@@ -44,8 +44,8 @@ class Groupserializer(serializers.ModelSerializer):
         fields = ['pk','group_name','admin','created_at','updated_at']
         
 
-class User_GroupsSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = User_Groups
-        fields = '__all__'
+# class User_GroupsSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = User_Groups
+#         fields = '__all__'
 

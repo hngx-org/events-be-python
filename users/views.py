@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from rest_framework import generics
 from rest_framework.response import Response
 from django.views import View
-from .serializers import UserSerializer,Groupserializer, User_GroupsSerializer
+from .serializers import UserSerializer,Groupserializer
 from .models import CustomUser,Group, User_Groups
 from authlib.integrations.django_client import OAuth
 from django.contrib.auth import get_user_model
@@ -223,13 +223,14 @@ def GetUserGroupsApiView(request, *args, **kwargs):
 
     if method == "GET":
         user = request.user
-        if user.is_authenticated:
+        if user:
             # Filter groups based on the user who created them
             created_groups = Group.objects.filter(admin=user)
             serializer = Groupserializer(created_groups, many=True)
             return Response(serializer.data)
-        
-class editUserGroup(generics.UpdateAPIView):
-    queryset = Group.objects.all()
-    serializer = User_GroupsSerializer
+        else:
+            return Response({"error":"user does not exist"},status=status.HTTP_401_UNAUTHORIZED)
+# class editUserGroup(generics.UpdateAPIView):
+#     queryset = Group.objects.all()
+#     serializer = User_GroupsSerializer
         

@@ -1,8 +1,9 @@
 from datetime import datetime
-
-from rest_framework.decorators import api_view, authentication_classes, permission_classes
+from rest_framework.decorators import api_view, authentication_classes
+from rest_framework.decorators import permission_classes
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
+from django.core.exceptions import ValidationError
 
 
 from .models import Comment
@@ -13,10 +14,13 @@ from users.authentication import AuthenticationMiddleware, IsAuthenticatedUser
 
 # Create your views here.
 @api_view(["POST"])
-@authentication_classes(AuthenticationMiddleware)
+# @authentication_classes(AuthenticationMiddleware)
 #@permission_classes(IsAuthenticatedUser)
 def create_comment(request, event_id, *args, **kwargs):
-    event = get_object_or_404(Events, pk=event_id)
+    try:
+        event = Events.objects.get(pk=event_id)
+    except (Events.DoesNotExist, ValidationError):
+        return Response({"detail": "Event ID is incorrect"}, status=404)
     current_time = datetime.utcnow()
     request.data['created_at'] = current_time.date()
     request.data['updated_at'] = current_time.date()
@@ -29,4 +33,4 @@ def create_comment(request, event_id, *args, **kwargs):
             "comment": request["comment"],
             "event_id": event_id,
         }
-        return Response(comment.data)
+        return Response(data)
