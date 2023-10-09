@@ -26,12 +26,9 @@ from django.conf.urls.static import static
 
 schema_view = get_schema_view(
     openapi.Info(
-        title="Your API",
+        title="Eventpy API",
         default_version='v1',
-        description="Your API Description",
-        terms_of_service="https://www.yourapp.com/terms/",
-        contact=openapi.Contact(email="contact@yourapp.com"),
-        license=openapi.License(name="Your License"),
+        description="Api for the HNGx event app", 
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
