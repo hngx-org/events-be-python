@@ -51,26 +51,19 @@ class getEvent(APIView):
             HTTP_404_NOT_FOUND)
 
 
-class SearchEventView(generics.ListAPIView):
+class SearchEventView(APIView):
     """
-    Search events by keywords and return events associated with the authenticated user.
+    Search events by keywords and return events.
     """
-    queryset = Events.objects.all()
-    serializer_class = EventsSerializer
-    # permission_classes = [IsAuthenticated]
-
-    def get_queryset(self):
-        keywords = self.request.query_params.get('keywords', '')
-        #case insensitive search
-        print(keywords)
-        return self.queryset.filter(
-            Q(title__icontains=keywords) | Q(description__icontains=keywords)
-        )
-    def list(self, request, *args, **kwargs):
-        queryset = self.get_queryset()
-        serializer = self.get_serializer(queryset, many=True)
+    def get(self, request, keyword):
+        try:
+            events = Events.objects.filter(
+                Q(title__icontains=keyword) | Q(description__icontains=keyword)
+            )
+        except:
+            return Response({"error": "no result"}, status=status.HTTP_404_NOT_FOUND)
+        serializer = EventsSerializer(events, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
     
     
 
