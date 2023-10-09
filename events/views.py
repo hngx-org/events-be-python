@@ -11,6 +11,7 @@ from rest_framework.views import APIView
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from users.models import CustomUser
+from rest_framework.permissions import IsAuthenticated
 
 class CreateEventView(generics.CreateAPIView):
     queryset = Events.objects.all()
@@ -18,10 +19,12 @@ class CreateEventView(generics.CreateAPIView):
 
 
 class EventsView(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         """
         Provides a get method handler that returns all events.
         """
+        print(request.user)
         queryset = Events.objects.all()
         serializer = EventsSerializer(queryset, many=True)
         return Response(serializer.data)
@@ -86,6 +89,7 @@ def update_event(request, format=None, event_id=None):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data)
+
 class CalenderView(generics.RetrieveAPIView):
     # permission_classes=[IsAuthenticated]
     queryset= Events.objects.all()

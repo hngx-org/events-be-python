@@ -2,7 +2,8 @@ from rest_framework.serializers import ModelSerializer
 from . models import Events
 
 
-class EventsSerializer(ModelSerializer):
+class EventsSerializer(serializers.ModelSerializer):
+    creator = serializers.PrimaryKeyRelatedField(read_only=True, default=serializers.CurrentUserDefault())
     class Meta:
         model = Events
         fields = '__all__'
