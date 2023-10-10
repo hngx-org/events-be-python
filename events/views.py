@@ -1,5 +1,5 @@
-from rest_framework import status, generics
-from rest_framework.decorators import api_view
+from rest_framework import status, generics 
+from rest_framework.generics import UpdateAPIView
 from .models import Events
 from django.contrib.auth.models import Group
 from .serializers import userGroupsSerializer
@@ -49,7 +49,26 @@ class getEvent(APIView):
         except Exception as e:
             return Response({"error": "event does not exist"}, status=status.
             HTTP_404_NOT_FOUND)
+            
 
+class UpdateEventView(UpdateAPIView):
+    queryset = Events.objects.all()  
+    serializer_class = EventsSerializer  
+    lookup_url_kwarg = 'event_id'  
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SearchEventView(APIView):
     """
@@ -66,27 +85,6 @@ class SearchEventView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     
-
-
-@api_view(['PUT', 'PATCH'])
-def update_event(request, format=None, event_id=None):
-    #Provides a method handler to update an event (PUT) or partially update an event (PATCH).
-
-    try:
-        event = Events.objects.get(pk=event_id)
-    except Events.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'PUT':
-        # For PUT, update the entire event object
-        serializer = EventsSerializer(event, data=request.data)
-    elif request.method == 'PATCH':
-        # For PATCH, update specific fields in the event object
-        serializer = EventsSerializer(event, data=request.data, partial=True)
-
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
 
 class CalenderView(generics.RetrieveAPIView):
     # permission_classes=[IsAuthenticated]
