@@ -86,10 +86,31 @@ class SearchEventView(APIView):
     
     
 
+
+class UpdateEventView(UpdateAPIView):
+    queryset = Events.objects.all()  
+    serializer_class = EventsSerializer  
+    lookup_url_kwarg = 'event_id'  
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 class CalenderView(generics.RetrieveAPIView):
     # permission_classes=[IsAuthenticated]
 
     queryset= Events.objects.all()
+    serializer_class = Calenderserializer
     def retrieve(self, request, *args, **kwargs):
         events= Events.objects.filter(creator=get_object_or_404(CustomUser,id=request.user.id))
         serializer = Calenderserializer(events, many=True)
