@@ -67,31 +67,18 @@ class SearchEventView(APIView):
     
     
 
-
-@api_view(['PUT', 'PATCH'])
-def update_event(request, format=None, event_id=None):
-    #Provides a method handler to update an event (PUT) or partially update an event (PATCH).
-
-    try:
-        event = Events.objects.get(pk=event_id)
-    except Events.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'PUT':
-        # For PUT, update the entire event object
-        serializer = EventsSerializer(event, data=request.data)
-    elif request.method == 'PATCH':
-        # For PATCH, update specific fields in the event object
-        serializer = EventsSerializer(event, data=request.data, partial=True)
-
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data)
+class EventUpdate(generics.RetrieveUpdateAPIView):
+    # permission_classes=[IsAuthenticated]
+    queryset= Events.objects.all()
+    serializer_class=EventsSerializer
+    lookup_field='id'
+    
 
 class CalenderView(generics.RetrieveAPIView):
     # permission_classes=[IsAuthenticated]
 
     queryset= Events.objects.all()
+    serializer_class = Calenderserializer
     def retrieve(self, request, *args, **kwargs):
         events= Events.objects.filter(creator=get_object_or_404(CustomUser,id=request.user.id))
         serializer = Calenderserializer(events, many=True)

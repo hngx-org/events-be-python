@@ -12,7 +12,7 @@ class EventsSerializer(serializers.ModelSerializer):
 class Calenderserializer(serializers.ModelSerializer):
     class Meta:
         model=Events
-        fields = ['title','start_date', 'end_date', 'start_time', 'end_time']
+        fields = ['id','title','start_date', 'end_date', 'start_time', 'end_time']
 class userGroupsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
