@@ -216,6 +216,20 @@ class UpdateGroupApiView(generics.UpdateAPIView):
         else:
             return Response({"error": "user can't be found."}, status=status.HTTP_401_UNAUTHORIZED)
     
+class DeleteGroupApiView(generics.DestroyAPIView):
+    queryset = Group.objects.all()
+    serializer_class = Groupserializer
+    lookup_field = 'pk'
+
+    def perform_destroy(self, instance):
+        user = self.request.user
+        group = self.get_object()  
+        if group.admin == user:
+            super().perform_destroy(instance)
+            return Response({"message": "group deleted successfully."}, status=status.HTTP_2 )
+        else:
+            return Response({"error": "user is not an admin."}, status=status.HTTP_401_UNAUTHORIZED)
+    
 
 @api_view(["GET"]) 
 def GetUserGroupsApiView(request, *args, **kwargs):
