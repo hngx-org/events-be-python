@@ -54,7 +54,7 @@ class getEvent(APIView):
 class UpdateEventView(UpdateAPIView):
     queryset = Events.objects.all()  
     serializer_class = EventsSerializer  
-    lookup_url_kwarg = 'event_id'  
+    lookup_url_kwarg = 'event_uuid'  
 
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
