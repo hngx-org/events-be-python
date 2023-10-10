@@ -54,8 +54,9 @@ class getEvent(APIView):
 class UpdateEventView(UpdateAPIView):
     queryset = Events.objects.all()  
     serializer_class = EventsSerializer  
-    lookup_url_kwarg = 'id'  
 
+    lookup_url_kwarg = 'event_uuid'  
+    
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -69,6 +70,7 @@ class UpdateEventView(UpdateAPIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class SearchEventView(APIView):
     """
