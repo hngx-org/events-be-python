@@ -70,6 +70,7 @@ class UpdateEventView(UpdateAPIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+
 class SearchEventView(APIView):
     """
     Search events by keywords and return events.
