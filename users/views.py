@@ -232,18 +232,28 @@ class DeleteGroupApiView(generics.DestroyAPIView):
         else:
             return Response({"error": "user is not an admin."}, status=status.HTTP_401_UNAUTHORIZED)
     
+class GetUserGroupsApiView(generics.ListAPIView):
+    # permission_classes=[IsAuthenticated]
 
-@api_view(["GET"]) 
-def GetUserGroupsApiView(request, *args, **kwargs):
-    method = request.method
-
-    if method == "GET":
-        user = request.user
-        User = get_object_or_404(CustomUser,id=user.id)
-        created_groups = Group.objects.filter(admin=User)
+    queryset = Group.objects.all()
+    serializer_class = Groupserializer
+    def get(self, request, *args, **kwargs):
+        created_groups= Group.objects.filter(admin=get_object_or_404(CustomUser,id=request.user.id))
         serializer = Groupserializer(created_groups, many=True)
-        return Response(serializer.data)   
-    return Response({"error":"user does not exist"},status=status.HTTP_401_UNAUTHORIZED)
+        data = {'user groups': serializer.data}
+        return Response(data, status=status.HTTP_200_OK)
+
+# @api_view(["GET"]) 
+# def GetUserGroupsApiView(request, *args, **kwargs):
+#     method = request.method
+
+#     if method == "GET":
+#         user = request.user
+#         User = get_object_or_404(CustomUser,id=user.id)
+#         created_groups = Group.objects.filter(admin=User)
+#         serializer = Groupserializer(created_groups, many=True)
+#         return Response(serializer.data)   
+#     return Response({"error":"user does not exist"},status=status.HTTP_401_UNAUTHORIZED)
         
 # class editUserGroup(generics.UpdateAPIView):
 #     queryset = Group.objects.all()

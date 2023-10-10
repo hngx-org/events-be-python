@@ -13,7 +13,7 @@ urlpatterns = [
     path('group/<int:pk>/update/',views.UpdateGroupApiView.as_view(),name='update_group'),
     path('group/<int:pk>/delete/',views.DeleteGroupApiView.as_view(),name='delete_group'),
     path('group/<int:pk>/',views.RetrieveGroupApiView.as_view(),name='retrieve_group'),
-    path('user_groups/',views.GetUserGroupsApiView,name='get_user_group'),
+    path('user_groups/',views.GetUserGroupsApiView.as_view(),name='get_user_group'),
     # path('edit-user-group/<int:pk>/', views.editUserGroup.as_view(), name='edit-user-group'),
 
 ]
