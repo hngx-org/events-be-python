@@ -30,7 +30,7 @@ def create_comment(request, event_id, *args, **kwargs):
     if comment.is_valid(raise_exception=True):
         comment.save()
         data = {
-            "comment": request["comment"],
+            "comment": request.data["comment"],
             "event_id": event_id,
         }
         return Response(data)
