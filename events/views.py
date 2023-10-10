@@ -1,5 +1,5 @@
-from rest_framework import status, generics
-from rest_framework.decorators import api_view
+from rest_framework import status, generics 
+from rest_framework.generics import UpdateAPIView
 from .models import Events
 from django.contrib.auth.models import Group
 from .serializers import userGroupsSerializer
@@ -49,7 +49,26 @@ class getEvent(APIView):
         except Exception as e:
             return Response({"error": "event does not exist"}, status=status.
             HTTP_404_NOT_FOUND)
+            
 
+class UpdateEventView(UpdateAPIView):
+    queryset = Events.objects.all()  
+    serializer_class = EventsSerializer  
+    lookup_url_kwarg = 'event_id'  
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class SearchEventView(APIView):
     """
@@ -67,12 +86,25 @@ class SearchEventView(APIView):
     
     
 
-class EventUpdate(generics.RetrieveUpdateAPIView):
-    # permission_classes=[IsAuthenticated]
-    queryset= Events.objects.all()
-    serializer_class=EventsSerializer
-    lookup_field='id'
-    
+
+class UpdateEventView(UpdateAPIView):
+    queryset = Events.objects.all()  
+    serializer_class = EventsSerializer  
+    lookup_url_kwarg = 'event_id'  
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CalenderView(generics.RetrieveAPIView):
     # permission_classes=[IsAuthenticated]
