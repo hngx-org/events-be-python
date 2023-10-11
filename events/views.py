@@ -6,14 +6,15 @@ from .serializers import userGroupsSerializer
 from .serializers import EventsSerializer, Calenderserializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-#from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q 
 from django.shortcuts import get_object_or_404
 from users.models import CustomUser
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from users.permissions import IsAuthenticatedSSO
 
 class CreateEventView(generics.CreateAPIView):
-    permission_classes = []
+    # permission_classes = [IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
 
@@ -27,7 +28,7 @@ class CreateEventView(generics.CreateAPIView):
 
 
 class EventsView(APIView):
-    permission_classes = []
+    permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         """
         Provides a get method handler that returns all events.

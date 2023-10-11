@@ -7,9 +7,8 @@ urlpatterns = [
     path('user/<str:id>/', views.SingleUserView.as_view(),name="user_detail"),
     
 
-    #path('login/', views.LoginView.as_view(), name='login'),
+    path('profile/', views.UserProfileView.as_view(), name='login'),
     # path('login/', views.newLoginView.as_view(), name='login'),
-    path('signup/', views.RegisterUser.as_view(), name='signup'),
     path('auth/', views.AuthView.as_view(), name='auth'),
     path('group/',views.CreateGroupApiView.as_view(),name='create_group'),
     path('group/<int:pk>/update/',views.UpdateGroupApiView.as_view(),name='update_group'),

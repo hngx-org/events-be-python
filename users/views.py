@@ -5,10 +5,7 @@ from django.views import View
 from .serializers import UserSerializer,Groupserializer
 from .models import CustomUser,Group, User_Groups
 from authlib.integrations.django_client import OAuth
-from django.contrib.auth import get_user_model
 from rest_framework import status
-from django.urls import reverse
-import uuid
 from .authentication import AuthenticationMiddleware, IsAuthenticatedUser
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
@@ -20,76 +17,50 @@ from rest_framework.exceptions import AuthenticationFailed
 from django.db.models import Q
 from rest_framework.decorators import api_view
 from users.serializers import LoginSerializer, RegisterSerializer
-from django.contrib.auth import login
 from django.shortcuts import get_object_or_404
+from social_django.models import UserSocialAuth
+from .permissions import IsAuthenticatedSSO
 
+from django.contrib.auth import login
+from social_django.utils import psa
+from rest_framework_simplejwt.tokens import RefreshToken
 
+class UserProfileView(APIView):
+    permission_classes = (IsAuthenticatedSSO,)
 
-
-class RegisterUser(generics.CreateAPIView):
-    """
-        Register new user and return the user the signup user up data, including sending an otp to email
-        address of the user for verifiication
-    """
-    permission_classes = []
-    queryset = CustomUser.objects.all()
-    serializer_class = RegisterSerializer
-    
-
-    def create(self, request, *args, **kwargs):
-        """OTP verification and validation"""
-        
-        serializer = RegisterSerializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        user_instance = serializer.save()
-        
-        # Get the serialized user data
-        
-        res = {"message": "Token sent!", "code": 200, "data": serializer.data}
-        return Response(res, status=status.HTTP_200_OK)
-class newLoginView(TokenObtainPairView):
-    serializer_class = LoginSerializer
-    permission_classes = ()
-    
-    def post(self, request, *args, **kwargs):
-        
-        serializer = self.get_serializer(data=request.data)
-        if not serializer.is_valid():
-            raise AuthenticationFailed('Invalid data. Check your email and password.')
+    def get(self, request):
+        user = request.user
 
         try:
-            email = serializer.initial_data['email']
-            password = serializer.initial_data['password']
-        except:
-            raise AuthenticationFailed('Email and password required')
+            # Try to get the user's social auth information
+            social_auth = UserSocialAuth.objects.get(user=user)
 
-        try:
-            
-            user = CustomUser.objects.get(email=email)
-            if not user.check_password(password):
-                raise AuthenticationFailed('Invalid email or password.')
+            # Extract user data from the social auth instance
+            user_data = {
+                'username': user.username,
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'provider': social_auth.provider,
+                'social_id': social_auth.uid,
+                'access_token': social_auth.extra_data.get('access_token'),
+            }
 
-            
-        except CustomUser.DoesNotExist:
-            raise AuthenticationFailed('Invalid email or password.')
+            # Generate a new access token using SimpleJWT
+            refresh = RefreshToken.for_user(user)
+            access_token = str(refresh.access_token)
+            refresh_token = str(refresh)
 
-        
-        try:
-            if serializer.is_valid():
-    
-                tokens = serializer.validated_data
-                custom_data = {
-                    'access': str(tokens['access']),
-                    'refresh': str(tokens['refresh']),
-                    'user_id': user.id,
-                }
-                return Response(custom_data, status=status.HTTP_200_OK)
-        except Exception as e:
-            print(str(e))
-        print("hek")
-        
-        
-        return Response({"serializer.errors":"hi"}, status=status.HTTP_400_BAD_REQUEST)
+            user_data['new_access_token'] = access_token
+            user_data['new_refresh_token'] = refresh_token
+
+            return Response(user_data, status=status.HTTP_200_OK)
+
+        except UserSocialAuth.DoesNotExist:
+            return Response({'error': 'User is not connected via SSO'}, status=status.HTTP_BAD_REQUEST)
+        except Exception as err:
+            return Response({'error': f'Error occurred: {err}'}, status=status.HTTP_INTERNAL_SERVER_ERROR)
+
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 oauth = OAuth()
@@ -106,43 +77,16 @@ oauth.register(
 class UserView(generics.ListAPIView):
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
-    authentication_classes = [AuthenticationMiddleware]
-    permission_classes = [IsAuthenticatedUser]
+    # authentication_classes = [AuthenticationMiddleware]
+    permission_classes = [IsAuthenticated]
     
 class SingleUserView(generics.RetrieveUpdateAPIView):
     authentication_classes = [AuthenticationMiddleware]
-    permission_classes = [IsAuthenticatedUser]
+    permission_classes = [IsAuthenticated]
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'id'  # Set the lookup field to 'id'
     
-    
-class LoginView(View):
-    def get(self, request):
-        redirect_uri = request.build_absolute_uri(reverse('auth'))
-        return oauth.google.authorize_redirect(request, redirect_uri)
-    
-    
-    def logout(self, request):
-        # Get the user's access token (make sure you have it stored somewhere)
-        access_token = request.session.get('google_access_token')
-
-        if access_token:
-            # Revoke the user's access token using Google's OAuth 2.0 token revocation endpoint
-            token_revocation_url = 'https://accounts.google.com/o/oauth2/revoke'
-            params = {'token': access_token}
-
-            response = request.get(token_revocation_url, params=params)
-
-            # Check if the token was revoked successfully
-            if response.status_code == 200:
-                # Clear the user's session and log them out
-                request.session.clear()
-                return redirect('login') 
-
-        # Handle the case where there was no access token (user not logged in)
-        return redirect('login')
-
 
 class AuthView(APIView):
     def post(self,request):

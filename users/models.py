@@ -7,15 +7,6 @@ from social_django.models import UserSocialAuth
 from django.db import models
 from social_django.models import UserSocialAuth
 
-class CustomUserSocialAuth(UserSocialAuth):
-    avatar = models.URLField(blank=True, null=True)
-    bio = models.TextField(blank=True, null=True)
-    
-    def __str__(self):
-        return self.user.username
-
-    # You can add more custom methods or fields here
-
 
 class CustomUserManager(BaseUserManager):
     """Manager of the user email"""
