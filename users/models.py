@@ -2,7 +2,19 @@ from django.conf import settings
 from django.db import models
 import uuid
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, AbstractUser
+from social_django.models import UserSocialAuth
 
+from django.db import models
+from social_django.models import UserSocialAuth
+
+class CustomUserSocialAuth(UserSocialAuth):
+    avatar = models.URLField(blank=True, null=True)
+    bio = models.TextField(blank=True, null=True)
+    
+    def __str__(self):
+        return self.user.username
+
+    # You can add more custom methods or fields here
 
 
 class CustomUserManager(BaseUserManager):
@@ -35,13 +47,16 @@ class CustomUserManager(BaseUserManager):
 
         """
         
+        """Create and return a superuser with an email and password."""
+        extra_fields.setdefault("is_staff", True)
         extra_fields.setdefault("is_superuser", True)
         extra_fields.setdefault("is_active", True)
-        extra_fields.setdefault("verified", True)
 
-        
         if extra_fields.get("is_superuser") is not True:
             raise ValueError("Superuser must have is_superuser=True.")
+        if extra_fields.get("is_staff") is not True:
+            raise ValueError("Superuser must have is_staff=True.")
+
         return self.create_user(email, password, **extra_fields)
 
 class CustomUser(AbstractUser):

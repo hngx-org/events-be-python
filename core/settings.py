@@ -49,7 +49,9 @@ INSTALLED_APPS = [
     "corsheaders",
     "rest_framework",
     'comments',
-    "allauth",
+
+    'social_django',
+    'rest_framework_social_oauth2',
     'rest_framework_simplejwt',
     'rest_framework_simplejwt.token_blacklist'
 ]
@@ -78,6 +80,7 @@ INSTALLED_APPS = [
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_social_oauth2.authentication.SocialAuthentication',
         "rest_framework_simplejwt.authentication.JWTAuthentication",
         
     ),
@@ -119,29 +122,35 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
 DATABASES = {
-    # 'default': {
-    #     'ENGINE': 'django.db.backends.sqlite3',
-    #     'NAME': BASE_DIR / 'db.sqlite3',
-    # }
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('PGDATABASE'),
-        'USER': config('PGUSER'),
-        'PASSWORD': config('PGPASSWORD'),
-        'HOST': config('PGHOST'),
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': config('PGDATABASE'),
+    #     'USER': config('PGUSER'),
+    #     'PASSWORD': config('PGPASSWORD'),
+    #     'HOST': config('PGHOST'),
+    #     'PORT': '5432',
+    # }
 }
 
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
 AUTHENTICATION_BACKENDS = (
-    # ...
-    #'allauth.account.auth_backends.AuthenticationBackend',
+    'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
-    # ...
 )
+
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+LOGIN_URL = '/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/' 
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -201,9 +210,6 @@ AUTHLIB_OAUTH_CLIENTS = {
 
 
 
-<<<<<<< HEAD
-
-=======
 SWAGGER_SETTINGS = {
     "USE_SESSION_AUTH": False,
     "relative_paths": False,
@@ -219,7 +225,6 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(days=10),#determines access token expiration time
     "REFRESH_TOKEN_LIFETIME": timedelta(days=10),#determines refresh token expiration time
 }
->>>>>>> a21cda0869c213c06e095aac272f4c7e3cb24c96
 
 CORS_ORIGIN_ALLOW_ALL = True
 

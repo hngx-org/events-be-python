@@ -280,3 +280,5 @@ class GetUserGroupsApiView(generics.ListAPIView):
 #     queryset = Group.objects.all()
 #     serializer = User_GroupsSerializer
         
+from social_django.models import UserSocialAuth
+user = UserSocialAuth.objects.all()
