@@ -6,28 +6,30 @@ from .serializers import GetEventsSerializer, userGroupsSerializer
 from .serializers import EventsSerializer, Calenderserializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-#from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q
+from rest_framework.permissions import IsAuthenticated
+from django.db.models import Q 
 from django.shortcuts import get_object_or_404
-from users.models import CustomUser
 from rest_framework.permissions import IsAuthenticated, AllowAny
+from social_django.models import UserSocialAuth
 
 class CreateEventView(generics.CreateAPIView):
-    permission_classes = []
+    permission_classes = [IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
 
     def post(self, request, *args, **kwargs):
         serializer = EventsSerializer(data=request.data)
         if serializer.is_valid():
-
-            serializer.save(creator=self.request.user)
+            user_id = request.user.id
+            user = get_object_or_404(UserSocialAuth, user_id=user_id)
+            
+            serializer.save(creator=user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EventsView(APIView):
-    permission_classes = []
+    permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         """
         Provides a get method handler that returns all events.
@@ -108,18 +110,18 @@ class UpdateEventView(UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CalenderView(generics.RetrieveAPIView):
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
 
     queryset= Events.objects.all()
     serializer_class = Calenderserializer
     def retrieve(self, request, *args, **kwargs):
-        events= Events.objects.filter(creator=get_object_or_404(CustomUser,id=request.user.id))
+        events= Events.objects.filter(creator=get_object_or_404(UserSocialAuth,id=request.user.id))
         serializer = Calenderserializer(events, many=True)
         context = {'calenderDetail': serializer.data}
         return Response(context, status=status.HTTP_200_OK)
 
 class EventDelView(generics.DestroyAPIView):
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     queryset= Events.objects.all()
     serializer_class=EventsSerializer
     lookup_field='id'
