@@ -46,6 +46,27 @@ class LoginView(View):
     def get(self, request):
         redirect_uri = request.build_absolute_uri(reverse('auth'))
         return oauth.google.authorize_redirect(request, redirect_uri)
+    
+    
+    def logout(self, request):
+        # Get the user's access token (make sure you have it stored somewhere)
+        access_token = request.session.get('google_access_token')
+
+        if access_token:
+            # Revoke the user's access token using Google's OAuth 2.0 token revocation endpoint
+            token_revocation_url = 'https://accounts.google.com/o/oauth2/revoke'
+            params = {'token': access_token}
+
+            response = request.get(token_revocation_url, params=params)
+
+            # Check if the token was revoked successfully
+            if response.status_code == 200:
+                # Clear the user's session and log them out
+                request.session.clear()
+                return redirect('login') 
+
+        # Handle the case where there was no access token (user not logged in)
+        return redirect('login')
 
 
 class AuthView(APIView):
@@ -107,3 +128,4 @@ class AuthView(APIView):
         response = Response(data, status=200)
 
         return response
+    
