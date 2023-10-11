@@ -1,8 +1,8 @@
-from rest_framework import status, generics 
+from rest_framework import status, generics
 from rest_framework.generics import UpdateAPIView
 from .models import Events
 from django.contrib.auth.models import Group
-from .serializers import userGroupsSerializer
+from .serializers import GetEventsSerializer, userGroupsSerializer
 from .serializers import EventsSerializer, Calenderserializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -21,10 +21,10 @@ class CreateEventView(generics.CreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = EventsSerializer(data=request.data)
         if serializer.is_valid():
-            
+
             serializer.save(creator=self.request.user)
             return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class EventsView(APIView):
@@ -37,26 +37,26 @@ class EventsView(APIView):
         queryset = Events.objects.all()
         serializer = EventsSerializer(queryset, many=True)
         return Response(serializer.data)
-    
-    
+
+
 class getEvent(APIView):
     """Handles getting event by id"""
     def get(self, request, event_id):
 
         try:
             event = Events.objects.get(id=event_id)
-            serilizer = EventsSerializer(event, context={'request': request})
+            serilizer = GetEventsSerializer(event, context={'request': request})
             return Response(serilizer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": "event does not exist"}, status=status.
             HTTP_404_NOT_FOUND)
-            
+
 
 class UpdateEventView(UpdateAPIView):
-    queryset = Events.objects.all()  
-    serializer_class = EventsSerializer  
-    lookup_url_kwarg = 'event_uuid'  
-    
+    queryset = Events.objects.all()
+    serializer_class = EventsSerializer
+    lookup_url_kwarg = 'event_uuid'
+
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
         serializer = self.get_serializer(instance)
@@ -85,14 +85,14 @@ class SearchEventView(APIView):
             return Response({"error": "no result"}, status=status.HTTP_404_NOT_FOUND)
         serializer = EventsSerializer(events, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    
+
+
 
 
 class UpdateEventView(UpdateAPIView):
-    queryset = Events.objects.all()  
-    serializer_class = EventsSerializer  
-    lookup_url_kwarg = 'event_uuid'  
+    queryset = Events.objects.all()
+    serializer_class = EventsSerializer
+    lookup_url_kwarg = 'event_uuid'
 
     def get(self, request, *args, **kwargs):
         instance = self.get_object()
@@ -127,4 +127,4 @@ class EventDelView(generics.DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         super().destroy(request, *args, **kwargs)
         return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
-    
+
