@@ -1,9 +1,9 @@
 from rest_framework import status, generics 
 from rest_framework.generics import UpdateAPIView
-from .models import Events
+from .models import Events, InterestInEvents
 from django.contrib.auth.models import Group
 from .serializers import userGroupsSerializer
-from .serializers import EventsSerializer, Calenderserializer
+from .serializers import EventsSerializer, Calenderserializer, InterestInEventsSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 #from rest_framework.permissions import IsAuthenticated
@@ -127,3 +127,19 @@ class EventDelView(generics.DestroyAPIView):
         super().destroy(request, *args, **kwargs)
         return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
     
+
+
+class JoinEvent(APIView):
+    def post(self, request, event_id):
+        event = get_object_or_404(Events, id=event_id)
+
+        serializer = InterestInEventsSerializer(data=request.data)
+
+        if serializer.is_valid():
+            if request.user.is_authenticated:
+                InterestInEvents.objects.get_or_create(event=event, user=request.user)
+                return Response({"message": "Success! You have expressed interest in the event."}, status=status.HTTP_201_CREATED)
+            else:
+                return Response({"message: Authentication required to express interest in the event, PLEASE REGISTER!. "}, status=status.HTTP_401_UNAUTHORIZED)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

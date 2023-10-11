@@ -1,6 +1,6 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
-from .models import Events
+from .models import Events, InterestInEvents
 
 
 class EventsSerializer(serializers.ModelSerializer):
@@ -17,4 +17,9 @@ class userGroupsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ('id', 'name') 
+
+class InterestInEventsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = InterestInEvents
+        fields = '__all__'
     
