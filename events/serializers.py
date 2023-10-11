@@ -7,7 +7,7 @@ class EventsSerializer(serializers.ModelSerializer):
     creator = serializers.UUIDField(read_only=True)
     class Meta:
         model = Events
-        fields = ['id','creator','title','description','location','start_date','group','end_date', 'start_time', 'end_time']
+        fields = ['id','creator','title','description','location','start_date','group','end_date', 'start_time', 'end_time', 'image']
 
 class Calenderserializer(serializers.ModelSerializer):
     class Meta:
