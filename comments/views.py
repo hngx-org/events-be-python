@@ -17,7 +17,7 @@ from users.authentication import AuthenticationMiddleware, IsAuthenticatedUser
 # Create your views here.
 @api_view(["POST"])
 # @authentication_classes(AuthenticationMiddleware)
-#@permission_classes(IsAuthenticatedUser)
+# @permission_classes(IsAuthenticatedUser)
 def create_comment(request, event_id, *args, **kwargs):
     try:
         event = Events.objects.get(pk=event_id)
@@ -64,3 +64,18 @@ class CommentCreateAPIView(generics.CreateAPIView):
                 "event_id": event_id,
                 }
             return Response(data)
+
+
+class CommentListAPIView(generics.ListAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get(self, request, event_id):
+        try:
+            Events.objects.get(pk=event_id)
+        except (Events.DoesNotExist, ValidationError):
+            return Response({"detail": "Event ID is incorrect"}, status=404)
+
+        comments = CommentSerializer(self.queryset.filter(event_id=event_id),
+                                     many=True)
+        return Response(comments.data)
