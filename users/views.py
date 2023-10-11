@@ -26,7 +26,7 @@ from social_django.utils import psa
 from rest_framework_simplejwt.tokens import RefreshToken
 
 class UserProfileView(APIView):
-    permission_classes = (IsAuthenticatedSSO,)
+    permission_classes = (IsAuthenticated,)
 
     def get(self, request):
         user = request.user
@@ -43,7 +43,7 @@ class UserProfileView(APIView):
                 'last_name': user.last_name,
                 'provider': social_auth.provider,
                 'social_id': social_auth.uid,
-                'access_token': social_auth.extra_data.get('access_token'),
+                # 'access_token': social_auth.extra_data.get('access_token'),
             }
 
             # Generate a new access token using SimpleJWT
@@ -51,15 +51,15 @@ class UserProfileView(APIView):
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
 
-            user_data['new_access_token'] = access_token
-            user_data['new_refresh_token'] = refresh_token
+            user_data['access_token'] = access_token
+            user_data['refresh_token'] = refresh_token
 
             return Response(user_data, status=status.HTTP_200_OK)
 
         except UserSocialAuth.DoesNotExist:
-            return Response({'error': 'User is not connected via SSO'}, status=status.HTTP_BAD_REQUEST)
+            return Response({'error': 'User is not connected via SSO'}, status=status.HTTP_401_UNAUTHORIZED)
         except Exception as err:
-            return Response({'error': f'Error occurred: {err}'}, status=status.HTTP_INTERNAL_SERVER_ERROR)
+            return Response({'error': f'Error occurred: {err}'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'

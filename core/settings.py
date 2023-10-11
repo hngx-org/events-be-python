@@ -52,36 +52,25 @@ INSTALLED_APPS = [
 
     'social_django',
     'rest_framework_social_oauth2',
-    # 'rest_framework_simplejwt',
-    # 'rest_framework_simplejwt.token_blacklist'
 ]
 
-AUTHENTICATION_BACKENDS = (
-    'social_core.backends.google.GoogleOAuth2',
-    'django.contrib.auth.backends.ModelBackend',
-)
-
-AUTHENTICATION_CLASSES = (
-    'oauth2_provider.contrib.rest_framework.OAuth2Authentication',
-)
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework.authentication.SessionAuthentication',  # Optional, use it if you need session authentication.
-        'rest_framework_social_oauth2.authentication.SocialAuthentication',
-        # 'rest_framework_simplejwt.authentication.JWTAuthentication',
-    
-    ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     )
 }
 
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    # 'django.contrib.auth.backends.ModelBackend',
+)
+
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
-# LOGIN_URL = '/'
+# LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = '/api/profile/'
-LOGOUT_REDIRECT_URL = '/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -91,9 +80,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
-
-                          
 ]
 
 ROOT_URLCONF = 'core.urls'

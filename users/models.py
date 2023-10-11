@@ -66,16 +66,16 @@ class CustomUser(AbstractUser):
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = []
 
-    @property
-    def is_anonymous(self):
-        pass
+    # @property
+    # def is_anonymous(self):
+    #     pass
     
-    @property
-    def is_authenticated(self):
-        pass
+    # @property
+    # def is_authenticated(self):
+    #     pass
 
-    def __str__(self):
-        return self.name
+    # def __str__(self):
+    #     return self.name
 
 
 class Group(models.Model):
