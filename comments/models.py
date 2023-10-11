@@ -5,7 +5,7 @@ from django.db import models
 
 
 from events.models import Events
-from users.models import CustomUser
+from social_django.models import UserSocialAuth
 import uuid
 
 def generateUUID():
@@ -19,8 +19,11 @@ class Comment(models.Model):
     created_at = models.DateTimeField(default=datetime.utcnow)
     updated_at = models.DateTimeField(default=datetime.utcnow)
     event_id = models.ForeignKey(Events, on_delete=models.CASCADE)
-    created_by = models.ForeignKey(CustomUser, on_delete=models.CASCADE,
+    created_by = models.ForeignKey(UserSocialAuth, on_delete=models.CASCADE,
                                    default=None)
+    picture = models.ImageField(upload_to='comment_pictures/', null=True, blank=True)
+    voice_note = models.FileField(upload_to='comment_voice_notes/', null=True, blank=True)
+
 
     def __str__(self) -> str:
         return str(self.id)
