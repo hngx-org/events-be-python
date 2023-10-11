@@ -2,11 +2,11 @@ from django.shortcuts import render,redirect
 from rest_framework import generics
 from rest_framework.response import Response
 from django.views import View
-from .serializers import UserSerializer,Groupserializer
-from .models import CustomUser,Group, User_Groups
+from .serializers import Groupserializer
+from .models import Group, User_Groups
 from authlib.integrations.django_client import OAuth
 from rest_framework import status
-from .authentication import AuthenticationMiddleware, IsAuthenticatedUser
+# from .authentication import IsAuthenticatedUser
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 from django.core.cache import cache
@@ -16,7 +16,6 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import AuthenticationFailed
 from django.db.models import Q
 from rest_framework.decorators import api_view
-from users.serializers import LoginSerializer, RegisterSerializer
 from django.shortcuts import get_object_or_404
 from social_django.models import UserSocialAuth
 from .permissions import IsAuthenticatedSSO
@@ -72,83 +71,6 @@ oauth.register(
     }
 )
 
-
-# Create your views here.
-class UserView(generics.ListAPIView):
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-    # authentication_classes = [AuthenticationMiddleware]
-    permission_classes = [IsAuthenticated]
-    
-class SingleUserView(generics.RetrieveUpdateAPIView):
-    authentication_classes = [AuthenticationMiddleware]
-    permission_classes = [IsAuthenticated]
-    queryset = CustomUser.objects.all()
-    serializer_class = UserSerializer
-    lookup_field = 'id'  # Set the lookup field to 'id'
-    
-
-class AuthView(APIView):
-    def post(self,request):
-        data = request.data
-        name = data.get("name")
-        email = data.get("email")
-        picture = data.get("photoUrl")
-        id = data.get("id")
-        print(id)
-        
-        try:
-            user = CustomUser.objects.get(id=id)
-        except CustomUser.DoesNotExist:
-            user = CustomUser.objects.create(email=email, id=str(id), name=name, avatar=picture)
-            
-        serializer = URLSafeTimedSerializer(AuthenticationMiddleware.secret_key)
-        session_token = serializer.dumps(str(user.id))
-
-        
-            
-        data = {
-            "success": True,
-            "user_id": id,
-            "session_token": session_token,
-            "status": 200
-        }
-        
-        return Response(data)
-        
-        
-    def get(self, request):
-        token = oauth.google.authorize_access_token(request)
-        email = token.get('userinfo', {}).get('email')
-        name = token.get('userinfo', {}).get('name')
-        picture = token.get('userinfo', {}).get('picture')
-        access_token = token.get('access_token', {})
-        id = token.get('userinfo', {}).get('sub')
-        access_token = token.get('access_token', {})
-
-        try:
-            user = CustomUser.objects.get(email=email)
-        except CustomUser.DoesNotExist:
-            user = CustomUser.objects.create(email=email, user_id=str(id), name=name, avatar=picture)
-            
-        # Set the is_active status in Redis
-        cache_key = f'user_active_status:{user.id}'
-        cache.set(cache_key, True)
-
-        # Generate a session token
-        serializer = URLSafeTimedSerializer(AuthenticationMiddleware.secret_key)
-        session_token = serializer.dumps(str(user.id))
-        
-        data = {
-            "success": True,
-            "user_id": id,
-            "session_token": session_token,
-            "status": 200
-        }
-        
-        response = Response(data, status=200)
-
-        return response
     
 
 class CreateGroupApiView(generics.ListCreateAPIView):
@@ -158,8 +80,9 @@ class CreateGroupApiView(generics.ListCreateAPIView):
     def post(self, request, *args, **kwargs):
         serializer = Groupserializer(data=request.data)
         if serializer.is_valid():
-            
-            serializer.save(admin=self.request.user)
+            user_id = request.user.id
+            admin_instance = get_object_or_404(UserSocialAuth, user_id=user_id)
+            serializer.save(admin=admin_instance)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
     
@@ -203,7 +126,7 @@ class GetUserGroupsApiView(generics.ListAPIView):
     queryset = Group.objects.all()
     serializer_class = Groupserializer
     def get(self, request, *args, **kwargs):
-        created_groups= Group.objects.filter(admin=get_object_or_404(CustomUser,id=request.user.id))
+        created_groups= Group.objects.filter(admin=get_object_or_404(UserSocialAuth,id=request.user.id))
         serializer = Groupserializer(created_groups, many=True)
         data = {'user groups': serializer.data}
         return Response(data, status=status.HTTP_200_OK)

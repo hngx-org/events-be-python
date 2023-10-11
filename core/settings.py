@@ -37,6 +37,9 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    
+    'social_django',
+    'rest_framework_social_oauth2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,24 +50,31 @@ INSTALLED_APPS = [
     'users',
     'events',
     'drf_yasg',
-    # "corsheaders",
+    "corsheaders",
     'comments',
 
-    'social_django',
-    'rest_framework_social_oauth2',
+    'rest_framework_simplejwt',
+    'rest_framework_simplejwt.token_blacklist',
 ]
+
+# AUTH_USER_MODEL = 'users.UserSocialAuth'
 
 
 REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'users.utils.CsrfExemptSessionAuthentication',
+        # 'rest_framework.authentication.SessionAuthentication',
+        # "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
     'DEFAULT_RENDERER_CLASSES': (
         'rest_framework.renderers.JSONRenderer',
     )
 }
-
+# CsrfExemptSessionAuthentication
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
-    # 'django.contrib.auth.backends.ModelBackend',
+    'django.contrib.auth.backends.ModelBackend',
 )
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
@@ -138,7 +148,6 @@ DATABASES = {
     }
 }
 
-AUTH_USER_MODEL = 'users.CustomUser'
 
 
 

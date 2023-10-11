@@ -3,13 +3,13 @@ from users import views
 
 
 urlpatterns = [
-    path('user/', views.UserView.as_view(), name="user_list"),
-    path('user/<str:id>/', views.SingleUserView.as_view(),name="user_detail"),
+    # path('user/', views.UserView.as_view(), name="user_list"),
+    # path('user/<str:id>/', views.SingleUserView.as_view(),name="user_detail"),
     
 
     path('profile/', views.UserProfileView.as_view(), name='login'),
     # path('login/', views.newLoginView.as_view(), name='login'),
-    path('auth/', views.AuthView.as_view(), name='auth'),
+    # path('auth/', views.AuthView.as_view(), name='auth'),
     path('group/',views.CreateGroupApiView.as_view(),name='create_group'),
     path('group/<int:pk>/update/',views.UpdateGroupApiView.as_view(),name='update_group'),
     path('group/<int:pk>/delete/',views.DeleteGroupApiView.as_view(),name='delete_group'),
