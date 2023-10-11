@@ -16,14 +16,9 @@ class CreateEventView(generics.CreateAPIView):
     permission_classes = []
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
-
-    def post(self, request, *args, **kwargs):
-        serializer = EventsSerializer(data=request.data)
-        if serializer.is_valid():
-            
-            serializer.save(creator=self.request.user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+    
+    def perform_create(self, serializer):
+        serializer.save(creator=self.request.user) 
 
 
 class EventsView(APIView):
