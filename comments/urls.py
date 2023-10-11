@@ -5,5 +5,5 @@ from . import views
 
 
 urlpatterns = [
-    path("api/<str:event_id>/comment", views.create_comment),
+    path("<str:event_id>/comment/", views.CommentCreateAPIView.as_view()),
 ]
