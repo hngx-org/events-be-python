@@ -13,6 +13,7 @@ from users.authentication import AuthenticationMiddleware, IsAuthenticatedUser
 @authentication_classes([AuthenticationMiddleware])
 @permission_classes([IsAuthenticatedUser])
 @parser_classes([MultiPartParser, FormParser])
+
 def create_comment(request, event_id, *args, **kwargs):
     try:
         event = get_object_or_404(Events, pk=event_id)
@@ -31,6 +32,7 @@ def create_comment(request, event_id, *args, **kwargs):
             data = {
                 "comment": comment.data["comment"],
                 "event_id": event_id,
+
             }
             return Response(data, status=status.HTTP_201_CREATED)
         else:
@@ -41,3 +43,18 @@ def create_comment(request, event_id, *args, **kwargs):
 
     except Exception as e:
         return Response({"error": str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CommentListAPIView(generics.ListAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
+
+    def get(self, request, event_id):
+        try:
+            Events.objects.get(pk=event_id)
+        except (Events.DoesNotExist, ValidationError):
+            return Response({"detail": "Event ID is incorrect"}, status=404)
+
+        comments = CommentSerializer(self.queryset.filter(event_id=event_id),
+                                     many=True)
+        return Response(comments.data)
