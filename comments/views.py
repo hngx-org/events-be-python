@@ -4,15 +4,16 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from rest_framework import status, generics
+from rest_framework import status
+from rest_framework import generics
+from rest_framework.validators import ValidationError
 from .models import Comment
 from .serializers import CommentSerializer
 from events.models import Events
-from users.authentication import AuthenticationMiddleware, IsAuthenticatedUser
+from rest_framework.permissions import IsAuthenticated
 
 @api_view(["POST"])
-@authentication_classes([AuthenticationMiddleware])
-@permission_classes([IsAuthenticatedUser])
+@permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
 
 def create_comment(request, event_id, *args, **kwargs):
