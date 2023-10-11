@@ -116,37 +116,37 @@ WSGI_APPLICATION = 'core.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-#     # 'default': {
-#     #     'ENGINE': 'django.db.backends.postgresql',
-#     #     'NAME': config('PGDATABASE'),
-#     #     'USER': config('PGUSER'),
-#     #     'PASSWORD': config('PGPASSWORD'),
-#     #     'HOST': config('PGHOST'),
-#     #     'PORT': '5432',
-#     # }
-# }
-
-
-DB_PW = os.getenv('DB_PW')
-
 DATABASES = {
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.sqlite3',
+    #     'NAME': BASE_DIR / 'db.sqlite3',
+    # }
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'events',
-        'USER': 'root',
-        'PASSWORD': DB_PW,
-        'HOST':'localhost',
-        'PORT':'3306',
-        'OPTIONS':{
-            'autocommit':True
-        }
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': config('PGDATABASE'),
+        'USER': config('PGUSER'),
+        'PASSWORD': config('PGPASSWORD'),
+        'HOST': config('PGHOST'),
+        'PORT': '5432',
     }
 }
+
+
+# DB_PW = os.getenv('DB_PW')
+
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'events',
+#         'USER': 'root',
+#         'PASSWORD': DB_PW,
+#         'HOST':'localhost',
+#         'PORT':'3306',
+#         'OPTIONS':{
+#             'autocommit':True
+#         }
+#     }
+# }
 
 
 
@@ -211,12 +211,6 @@ SWAGGER_SETTINGS = {
         "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"},
     },
 }
-#settings for simple-jwt
-# from datetime import timedelta
-# SIMPLE_JWT = {
-#     "ACCESS_TOKEN_LIFETIME": timedelta(days=10),#determines access token expiration time
-#     "REFRESH_TOKEN_LIFETIME": timedelta(days=10),#determines refresh token expiration time
-# }
 
 CORS_ORIGIN_ALLOW_ALL = True
 
