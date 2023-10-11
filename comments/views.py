@@ -3,11 +3,12 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from rest_framework import status
+from rest_framework import status, generics
 from .models import Comment
 from .serializers import CommentSerializer
 from events.models import Events
 from users.authentication import AuthenticationMiddleware, IsAuthenticatedUser
+from django.core.exceptions import ValidationError
 
 @api_view(["POST"])
 @authentication_classes([AuthenticationMiddleware])
