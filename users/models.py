@@ -50,7 +50,7 @@ class CustomUser(AbstractUser):
     user_id = models.CharField(max_length=255, blank=True, null=True)
     name = models.CharField(max_length=225, blank=True, null=True)
     email = models.EmailField(unique=True)
-    password = models.CharField(max_length=255, blank=False)
+    password = models.CharField(max_length=255, blank=False,null=True)
     avatar = models.TextField(blank=True, null=True) #change to cloudinary later
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)

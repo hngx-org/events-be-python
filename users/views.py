@@ -22,7 +22,9 @@ from rest_framework.decorators import api_view
 from users.serializers import LoginSerializer, RegisterSerializer
 from django.contrib.auth import login
 from django.shortcuts import get_object_or_404
-
+from events.serializers import userGroupsSerializerGet
+from .serializers import UserSerializer
+from events.serializers import EventsSerializer
 
 
 
@@ -243,6 +245,28 @@ class GetUserGroupsApiView(generics.ListAPIView):
         data = {'user groups': serializer.data}
         return Response(data, status=status.HTTP_200_OK)
 
+class GetUserGroupDetail(APIView):
+    def get(self,request):
+        User= get_object_or_404(CustomUser,id=request.user.id)
+        groups = Group.objects.filter(admin=User)
+        # groups=User_Groups.objects.filter(group=group)
+        user_groupSerialize=userGroupsSerializerGet(groups,many=True)
+        group_info=[{
+            'groupCount':len(groups)
+        }]
+        for group in groups:
+            # members = group.user_set.all()
+            # members_serialize=UserSerializer(members,many=True)
+            events=group.events_set.all()
+            events_serialize=EventsSerializer(events,many=True)
+            group_info.append({
+                'group': user_groupSerialize.data,
+                # 'memberCount':len(members),
+                # 'members': members_serialize.data,
+                'eventCount': len(events),
+                'events': events_serialize.data
+            })
+        return Response(group_info,status=status.HTTP_200_OK)
 # @api_view(["GET"]) 
 # def GetUserGroupsApiView(request, *args, **kwargs):
 #     method = request.method
