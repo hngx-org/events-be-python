@@ -1,26 +1,17 @@
-from django.shortcuts import render,redirect
 from rest_framework import generics
 from rest_framework.response import Response
-from django.views import View
 from .serializers import Groupserializer
-from .models import Group, User_Groups
+from .models import Group
 from authlib.integrations.django_client import OAuth
 from rest_framework import status
-# from .authentication import IsAuthenticatedUser
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
-from django.core.cache import cache
-from itsdangerous import URLSafeTimedSerializer
-from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import AuthenticationFailed
-from django.db.models import Q
-from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from social_django.models import UserSocialAuth
-from .permissions import IsAuthenticatedSSO
-from social_django.utils import load_strategy
+from events.serializers import userGroupsSerializerGet
+from events.serializers import EventsSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+
 
 class UserProfileView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -34,12 +25,14 @@ class UserProfileView(APIView):
 
             # Extract user data from the social auth instance
             user_data = {
+                'message':'User login successful',
                 'username': user.username,
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'provider': social_auth.provider,
                 'social_id': social_auth.uid,
+                #'profile_image':response['photos'][0]['url']
                 # 'access_token': social_auth.extra_data.get('access_token'),
             }
 
@@ -48,8 +41,6 @@ class UserProfileView(APIView):
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
 
-            user_data['access_token'] = access_token
-            user_data['refresh_token'] = refresh_token
 
             return Response(user_data, status=status.HTTP_200_OK)
 
@@ -135,7 +126,7 @@ class DeleteGroupApiView(generics.DestroyAPIView):
             return Response({"error": "user is not an admin."}, status=status.HTTP_401_UNAUTHORIZED)
     
 class GetUserGroupsApiView(generics.ListAPIView):
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
 
     queryset = Group.objects.all()
     serializer_class = Groupserializer
@@ -144,3 +135,22 @@ class GetUserGroupsApiView(generics.ListAPIView):
         serializer = Groupserializer(created_groups, many=True)
         data = {'user groups': serializer.data}
         return Response(data, status=status.HTTP_200_OK)
+
+class GetUserGroupDetail(APIView):
+    def get(self,request):
+        user= get_object_or_404(UserSocialAuth,id=request.user.id)
+        groups = Group.objects.filter(admin=user)
+        user_groupSerialize=userGroupsSerializerGet(groups,many=True)
+        group_info=[{
+            'groupCount':len(groups)
+        }]
+        for group in groups:
+            events=group.events_set.all()
+            events_serialize=EventsSerializer(events,many=True)
+            group_info.append({
+                'group_name': group.group_name,
+                'eventCount': len(events),
+                'events': events_serialize.data
+            })
+        return Response(group_info,status=status.HTTP_200_OK)
+
