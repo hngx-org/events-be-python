@@ -51,6 +51,7 @@ def create_comment(request, event_id, *args, **kwargs):
 class CommentListAPIView(generics.ListAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, event_id):
         try:
