@@ -12,6 +12,7 @@ from .serializers import CommentSerializer
 from events.models import Events
 from rest_framework.permissions import IsAuthenticated
 from social_django.models import UserSocialAuth
+from django.core.exceptions import ValidationError
 
 
 @api_view(["POST"])
