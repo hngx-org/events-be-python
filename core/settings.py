@@ -129,7 +129,7 @@ DATABASES = {
         'USER': config('PGUSER'),
         'PASSWORD': config('PGPASSWORD'),
         'HOST': config('PGHOST'),
-        'PORT': '5432',
+       'PORT': '5432',
     }
 }
 
