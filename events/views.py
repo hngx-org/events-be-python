@@ -114,9 +114,13 @@ class CalenderView(generics.RetrieveAPIView):
     queryset= Events.objects.all()
     serializer_class = Calenderserializer
     def retrieve(self, request, *args, **kwargs):
-        events= Events.objects.filter(creator=get_object_or_404(UserSocialAuth,id=request.user.id))
-        serializer = Calenderserializer(events, many=True)
-        context = {'calenderDetail': serializer.data}
+        Interests= InterestInEvents.objects.filter(user=get_object_or_404(UserSocialAuth,id=request.user.id))
+        data=[]
+        for interest in Interests:
+            event=interest.event
+            serializer = Calenderserializer(event)
+            data.append(serializer.data)
+        context = {'calenderDetail': data}
         return Response(context, status=status.HTTP_200_OK)
 
 class EventDelView(generics.DestroyAPIView):
