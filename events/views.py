@@ -159,14 +159,25 @@ class JoinEvent(APIView):
         user_id = request.user.id
         
         user = get_object_or_404(UserSocialAuth, user_id=user_id)
-        
-        print(type(user))
          
         serializer = InterestInEventsSerializer(data=request.data, context={'event': event, 'user': user})
 
         if serializer.is_valid():
             
-            InterestInEvents.objects.get_or_create(event=event, user=request.user)
-            return Response({f"message": "Success! You have expressed interest in the {event.title}event."}, status=status.HTTP_201_CREATED)
+            InterestInEvents.objects.get_or_create(event=event, user=user)
+            return Response({f"message": "Success! You have expressed interest in the {event.title} event."}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
+class LeaveEvent(APIView):
+    def delete(self, request, event_id):
+        event = get_object_or_404(Events, id=event_id)
+        user_id = request.user.id
+        user = get_object_or_404(UserSocialAuth, user_id=user_id)
+        try:
+            interest = InterestInEvents.objects.get(event=event, user=user)
+            interest.delete()
+            return Response({"message": "You have successfully deleted your interest in this event."}, status=status.HTTP_204_NO_CONTENT)
+        except InterestInEvents.DoesNotExist:
+            return Response({"message": "You have not expressed interest in this event."}, status=status.HTTP_404_NOT_FOUND)
