@@ -119,32 +119,32 @@ DATABASES = {
     #     'ENGINE': 'django.db.backends.sqlite3',
     #     'NAME': BASE_DIR / 'db.sqlite3',
     # }
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': config('PGDATABASE'),
-        'USER': config('PGUSER'),
-        'PASSWORD': config('PGPASSWORD'),
-        'HOST': config('PGHOST'),
-        'PORT': '5432',
-    }
+    # 'default': {
+    #     'ENGINE': 'django.db.backends.postgresql',
+    #     'NAME': config('PGDATABASE'),
+    #     'USER': config('PGUSER'),
+    #     'PASSWORD': config('PGPASSWORD'),
+    #     'HOST': config('PGHOST'),
+    #     'PORT': '5432',
+    # }
 }
 
 
-# DB_PW = os.getenv('DB_PW')
+DB_PW = os.getenv('DB_PW')
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'events',
-#         'USER': 'root',
-#         'PASSWORD': DB_PW,
-#         'HOST':'localhost',
-#         'PORT':'3306',
-#         'OPTIONS':{
-#             'autocommit':True
-#         }
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'events',
+        'USER': 'root',
+        'PASSWORD': DB_PW,
+        'HOST':'localhost',
+        'PORT':'3306',
+        'OPTIONS':{
+            'autocommit':True
+        }
+    }
+}
 
 
 
