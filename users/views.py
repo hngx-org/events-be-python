@@ -3,7 +3,7 @@ from rest_framework import generics
 from rest_framework.response import Response
 from django.views import View
 from .serializers import Groupserializer
-from .models import Group, User_Groups,CustomUser
+from .models import Group, User_Groups
 from authlib.integrations.django_client import OAuth
 from rest_framework import status
 # from .authentication import IsAuthenticatedUser
@@ -135,8 +135,8 @@ class GetUserGroupsApiView(generics.ListAPIView):
 
 class GetUserGroupDetail(APIView):
     def get(self,request):
-        User= get_object_or_404(CustomUser,id=request.user.id)
-        groups = Group.objects.filter(admin=User)
+        user= get_object_or_404(UserSocialAuth,id=request.user.id)
+        groups = Group.objects.filter(admin=user)
         # groups=User_Groups.objects.filter(group=group)
         user_groupSerialize=userGroupsSerializerGet(groups,many=True)
         group_info=[{
@@ -148,7 +148,7 @@ class GetUserGroupDetail(APIView):
             events=group.events_set.all()
             events_serialize=EventsSerializer(events,many=True)
             group_info.append({
-                'group': user_groupSerialize.data,
+                'group_name': group.group_name,
                 # 'memberCount':len(members),
                 # 'members': members_serialize.data,
                 'eventCount': len(events),
