@@ -27,6 +27,7 @@ class CreateEventView(generics.CreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+
 class EventsView(APIView):
     permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
