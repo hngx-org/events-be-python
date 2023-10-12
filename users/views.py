@@ -19,10 +19,13 @@ from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from social_django.models import UserSocialAuth
 from .permissions import IsAuthenticatedSSO
-
+from events.serializers import userGroupsSerializerGet
+from .serializers import UserSerializer
+from events.serializers import EventsSerializer
 from django.contrib.auth import login
 from social_django.utils import psa
 from rest_framework_simplejwt.tokens import RefreshToken
+
 
 class UserProfileView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -36,12 +39,14 @@ class UserProfileView(APIView):
 
             # Extract user data from the social auth instance
             user_data = {
+                'message':'User login successful',
                 'username': user.username,
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'provider': social_auth.provider,
                 'social_id': social_auth.uid,
+                #'profile_image':response['photos'][0]['url']
                 # 'access_token': social_auth.extra_data.get('access_token'),
             }
 
@@ -50,8 +55,8 @@ class UserProfileView(APIView):
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
 
-            user_data['access_token'] = access_token
-            user_data['refresh_token'] = refresh_token
+            # user_data['access_token'] = access_token
+            # user_data['refresh_token'] = refresh_token
 
             return Response(user_data, status=status.HTTP_200_OK)
 
@@ -121,7 +126,7 @@ class DeleteGroupApiView(generics.DestroyAPIView):
             return Response({"error": "user is not an admin."}, status=status.HTTP_401_UNAUTHORIZED)
     
 class GetUserGroupsApiView(generics.ListAPIView):
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
 
     queryset = Group.objects.all()
     serializer_class = Groupserializer
@@ -131,6 +136,28 @@ class GetUserGroupsApiView(generics.ListAPIView):
         data = {'user groups': serializer.data}
         return Response(data, status=status.HTTP_200_OK)
 
+class GetUserGroupDetail(APIView):
+    def get(self,request):
+        user= get_object_or_404(UserSocialAuth,id=request.user.id)
+        groups = Group.objects.filter(admin=user)
+        # groups=User_Groups.objects.filter(group=group)
+        user_groupSerialize=userGroupsSerializerGet(groups,many=True)
+        group_info=[{
+            'groupCount':len(groups)
+        }]
+        for group in groups:
+            # members = group.user_set.all()
+            # members_serialize=UserSerializer(members,many=True)
+            events=group.events_set.all()
+            events_serialize=EventsSerializer(events,many=True)
+            group_info.append({
+                'group_name': group.group_name,
+                # 'memberCount':len(members),
+                # 'members': members_serialize.data,
+                'eventCount': len(events),
+                'events': events_serialize.data
+            })
+        return Response(group_info,status=status.HTTP_200_OK)
 # @api_view(["GET"]) 
 # def GetUserGroupsApiView(request, *args, **kwargs):
 #     method = request.method

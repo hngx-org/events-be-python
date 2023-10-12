@@ -4,11 +4,15 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
-from rest_framework import status, generics
+from rest_framework import status
+from rest_framework import generics
+from rest_framework.validators import ValidationError
 from .models import Comment
 from .serializers import CommentSerializer
 from events.models import Events
 from rest_framework.permissions import IsAuthenticated
+from social_django.models import UserSocialAuth
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -22,7 +26,7 @@ def create_comment(request, event_id, *args, **kwargs):
         request.data['created_at'] = current_time
         request.data['updated_at'] = current_time
         request.data['event_id'] = event.id
-        request.data['created_by'] = request.user.id
+        request.data['created_by'] = get_object_or_404(UserSocialAuth,id=request.user.id)
 
         comment = CommentSerializer(data=request.data)
 
