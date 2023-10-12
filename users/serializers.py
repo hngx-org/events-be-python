@@ -22,3 +22,8 @@ class User_GroupsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User_Groups
         fields = '__all__'
+
+class AddFriendToGroupSerializer(serializers.Serializer):
+    friend_ids = serializers.ListField(
+        child=serializers.PrimaryKeyRelatedField(queryset=UserSocialAuth.objects.all())
+    )
