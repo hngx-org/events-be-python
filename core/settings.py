@@ -10,13 +10,8 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 import os
-# from dotenv import load_dotenv
-
-
 from pathlib import Path
 from decouple import config
-
-# load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -37,7 +32,6 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-    
     'social_django',
     'rest_framework_social_oauth2',
     'django.contrib.admin',
@@ -57,9 +51,6 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
 ]
 
-# AUTH_USER_MODEL = 'users.UserSocialAuth'
-
-
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'users.utils.CsrfExemptSessionAuthentication',
@@ -68,15 +59,12 @@ REST_FRAMEWORK = {
     #     'rest_framework.renderers.JSONRenderer',
     # )
 }
-# CsrfExemptSessionAuthentication
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
-# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '552452171826-cmqllqfietp2rmie1er2oj063b1p5cil.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
@@ -129,29 +117,9 @@ DATABASES = {
         'USER': config('PGUSER'),
         'PASSWORD': config('PGPASSWORD'),
         'HOST': config('PGHOST'),
-        'PORT': '5432',
+       'PORT': '5432',
     }
 }
-
-
-# DB_PW = os.getenv('DB_PW')
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'events',
-#         'USER': 'root',
-#         'PASSWORD': DB_PW,
-#         'HOST':'localhost',
-#         'PORT':'3306',
-#         'OPTIONS':{
-#             'autocommit':True
-#         }
-#     }
-# }
-
-
-
 
 
 # Password validation
@@ -194,14 +162,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_build', 'static')
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-AUTHLIB_OAUTH_CLIENTS = {
-    'google': {
-        'client_id': "552452171826-fepna48o3qapjmri8bif9tr8c45l050r.apps.googleusercontent.com",
-        'client_secret': "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",
-    }
-}
-
 
 
 SWAGGER_SETTINGS = {

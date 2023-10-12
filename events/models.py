@@ -28,3 +28,4 @@ class InterestInEvents(models.Model):
     event = models.ForeignKey(Events, on_delete=models.CASCADE)
     user = models.ForeignKey(UserSocialAuth, on_delete=models.CASCADE)
     create_at = models.DateTimeField(auto_now_add=True)
+
