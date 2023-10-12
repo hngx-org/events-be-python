@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.forms import ValidationError
 from rest_framework.decorators import api_view, authentication_classes, permission_classes, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -10,6 +11,8 @@ from .models import Comment
 from .serializers import CommentSerializer
 from events.models import Events
 from rest_framework.permissions import IsAuthenticated
+from social_django.models import UserSocialAuth
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -20,11 +23,10 @@ def create_comment(request, event_id, *args, **kwargs):
         event = get_object_or_404(Events, pk=event_id)
         current_time = datetime.utcnow()
 
-        # Adjust the request data to include created_at, updated_at, event_id, and created_by
         request.data['created_at'] = current_time
         request.data['updated_at'] = current_time
         request.data['event_id'] = event.id
-        request.data['created_by'] = request.user.id
+        request.data['created_by'] = get_object_or_404(UserSocialAuth,id=request.user.id)
 
         comment = CommentSerializer(data=request.data)
 
