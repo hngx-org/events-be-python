@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
 ]
 
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'users.utils.CsrfExemptSessionAuthentication',
@@ -59,14 +60,15 @@ REST_FRAMEWORK = {
         'rest_framework.renderers.JSONRenderer',
     )
 }
+# CsrfExemptSessionAuthentication
 
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 
-SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
-SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '552452171826-cmqllqfietp2rmie1er2oj063b1p5cil.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 SESSION_COOKIE_SAMESITE = None
 # LOGIN_URL = 'login'
@@ -122,21 +124,6 @@ DATABASES = {
 }
 
 
-# DB_PW = os.getenv('DB_PW')
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'events',
-#         'USER': 'root',
-#         'PASSWORD': DB_PW,
-#         'HOST':'localhost',
-#         'PORT':'3306',
-#         'OPTIONS':{
-#             'autocommit':True
-#         }
-#     }
-# }
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
