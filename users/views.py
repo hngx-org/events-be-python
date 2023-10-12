@@ -11,6 +11,8 @@ from social_django.models import UserSocialAuth
 from events.serializers import userGroupsSerializerGet
 from events.serializers import EventsSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from django.urls import reverse
+import requests
 
 
 class UserProfileView(APIView):
@@ -49,7 +51,14 @@ class UserProfileView(APIView):
         except Exception as err:
             return Response({'error': f'Error occurred: {err}'}, status=status.HTTP_401_UNAUTHORIZED)
 
-import requests
+
+
+class GoogleLoginView(APIView):
+    def post(self, request):
+        auth_url = reverse('social:begin', args=['google-oauth2'])
+        return Response({'auth_url': request.build_absolute_uri(auth_url)}, status=status.HTTP_200_OK)
+
+
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
     def post(self, request):
