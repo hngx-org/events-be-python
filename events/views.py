@@ -165,7 +165,7 @@ class JoinEvent(APIView):
         if serializer.is_valid():
             
             InterestInEvents.objects.get_or_create(event=event, user=user)
-            return Response({f"message": "Success! You have expressed interest in the {event.title} event."}, status=status.HTTP_201_CREATED)
+            return Response({"message": f"Success! You have expressed interest in the {event.title} event."}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         

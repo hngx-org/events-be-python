@@ -97,6 +97,22 @@ class RetrieveGroupApiView(generics.RetrieveAPIView):
     serializer_class = Groupserializer
     lookup_field = 'pk'
 
+    def get(self, request, pk, *args, **kwargs):
+        group = get_object_or_404(Group, pk=pk)
+        serializer = Groupserializer(group)
+        events = group.events_set.all()
+        events_serialize = EventsSerializer(events, many=True)
+        data = {
+            'group': serializer.data,
+            'events': events_serialize.data
+        }
+        return Response(data, status=status.HTTP_200_OK)
+    
+
+
+
+
+
 class UpdateGroupApiView(generics.UpdateAPIView):
     queryset = Group.objects.all()
     serializer_class = Groupserializer
