@@ -1,4 +1,5 @@
 from datetime import datetime
+from django.forms import ValidationError
 from rest_framework.decorators import api_view, authentication_classes, permission_classes, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
@@ -20,7 +21,6 @@ def create_comment(request, event_id, *args, **kwargs):
         event = get_object_or_404(Events, pk=event_id)
         current_time = datetime.utcnow()
 
-        # Adjust the request data to include created_at, updated_at, event_id, and created_by
         request.data['created_at'] = current_time
         request.data['updated_at'] = current_time
         request.data['event_id'] = event.id
