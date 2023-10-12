@@ -8,11 +8,10 @@ from rest_framework import status, generics
 from .models import Comment
 from .serializers import CommentSerializer
 from events.models import Events
-from users.authentication import AuthenticationMiddleware, IsAuthenticatedUser
+from rest_framework.permissions import IsAuthenticated
 
 @api_view(["POST"])
-@authentication_classes([AuthenticationMiddleware])
-@permission_classes([IsAuthenticatedUser])
+@permission_classes([IsAuthenticated])
 @parser_classes([MultiPartParser, FormParser])
 
 def create_comment(request, event_id, *args, **kwargs):
