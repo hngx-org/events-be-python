@@ -53,6 +53,17 @@ class getEvent(APIView):
             HTTP_404_NOT_FOUND)
 
 
+class getGroupEvents(APIView):
+    def get(self, request, group_id):
+        """
+        Provides a get method handler that returns all events of a particular view.
+        """
+        queryset = Events.objects.filter(group=group_id)
+        serializer = EventsSerializer(queryset, many=True)
+        return Response(serializer.data)
+
+
+
 class UpdateEventView(UpdateAPIView):
     queryset = Events.objects.all()
     serializer_class = EventsSerializer

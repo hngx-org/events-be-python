@@ -13,4 +13,5 @@ urlpatterns = [
     path('events/<uuid:event_uuid>/update/', views.UpdateEventView.as_view(), name='event-update'),
     path('events/calendar', views.CalenderView.as_view(), name='calender'),
     path('events/<str:id>/delete',views.EventDelView.as_view(), name='Delevent'),
+    path('<str:group_id>/events/', views.getGroupEvents.as_view(), name='group-events'),
 ]
