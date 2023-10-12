@@ -16,6 +16,7 @@ class CreateEventView(generics.CreateAPIView):
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
 
+
     def post(self, request, *args, **kwargs):
         serializer = EventsSerializer(data=request.data)
         if serializer.is_valid():
@@ -25,6 +26,7 @@ class CreateEventView(generics.CreateAPIView):
             serializer.save(creator=user)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class EventsView(APIView):
@@ -49,6 +51,23 @@ class getEvent(APIView):
             return Response(serilizer.data, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": "event does not exist"}, status=status.
+            HTTP_404_NOT_FOUND)
+
+
+class getGroupEvents(APIView):
+    """Handles getting events in a group"""
+    def get(self, request, group_id):
+
+        try:
+            get_object_or_404(Group, pk=group_id)
+            event = Events.objects.filter(group=group_id)
+            serilizer = GetEventsSerializer(event, context={'request': request}, many=True)
+            if not event.exists():
+                return Response({"error": "No event for this group"}, status=status.
+            HTTP_404_NOT_FOUND)
+            return Response(serilizer.data, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.
             HTTP_404_NOT_FOUND)
 
 
@@ -81,6 +100,8 @@ class SearchEventView(APIView):
             events = Events.objects.filter(
                 Q(title__icontains=keyword) | Q(description__icontains=keyword)
             )
+            if not events.exists():
+                return Response({"Message":"No event containing '{}' found!".format(keyword)}, status=status.HTTP_404_NOT_FOUND)
         except:
             return Response({"error": "no result"}, status=status.HTTP_404_NOT_FOUND)
         serializer = EventsSerializer(events, many=True)
@@ -135,14 +156,17 @@ class EventDelView(generics.DestroyAPIView):
 class JoinEvent(APIView):
     def post(self, request, event_id):
         event = get_object_or_404(Events, id=event_id)
-
-        serializer = InterestInEventsSerializer(data=request.data)
+        user_id = request.user.id
+        
+        user = get_object_or_404(UserSocialAuth, user_id=user_id)
+        
+        print(type(user))
+         
+        serializer = InterestInEventsSerializer(data=request.data, context={'event': event, 'user': user})
 
         if serializer.is_valid():
-            if request.user.is_authenticated:
-                InterestInEvents.objects.get_or_create(event=event, user=request.user)
-                return Response({"message": "Success! You have expressed interest in the event."}, status=status.HTTP_201_CREATED)
-            else:
-                return Response({"message: Authentication required to express interest in the event, PLEASE REGISTER!. "}, status=status.HTTP_401_UNAUTHORIZED)
+            
+            InterestInEvents.objects.get_or_create(event=event, user=request.user)
+            return Response({f"message": "Success! You have expressed interest in the {event.title}event."}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

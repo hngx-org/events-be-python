@@ -11,6 +11,8 @@ from .models import Comment
 from .serializers import CommentSerializer
 from events.models import Events
 from rest_framework.permissions import IsAuthenticated
+from social_django.models import UserSocialAuth
+
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -24,7 +26,7 @@ def create_comment(request, event_id, *args, **kwargs):
         request.data['created_at'] = current_time
         request.data['updated_at'] = current_time
         request.data['event_id'] = event.id
-        request.data['created_by'] = request.user.id
+        request.data['created_by'] = get_object_or_404(UserSocialAuth,id=request.user.id)
 
         comment = CommentSerializer(data=request.data)
 
