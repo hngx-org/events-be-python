@@ -81,6 +81,8 @@ class SearchEventView(APIView):
             events = Events.objects.filter(
                 Q(title__icontains=keyword) | Q(description__icontains=keyword)
             )
+            if not events.exists():
+                return Response({"Message":"No event containing '{}' found!".format(keyword)}, status=status.HTTP_404_NOT_FOUND)
         except:
             return Response({"error": "no result"}, status=status.HTTP_404_NOT_FOUND)
         serializer = EventsSerializer(events, many=True)

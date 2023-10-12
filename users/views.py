@@ -26,6 +26,7 @@ from django.contrib.auth import login
 from social_django.utils import psa
 from rest_framework_simplejwt.tokens import RefreshToken
 
+
 class UserProfileView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -45,6 +46,7 @@ class UserProfileView(APIView):
                 'last_name': user.last_name,
                 'provider': social_auth.provider,
                 'social_id': social_auth.uid,
+                #'profile_image':response['photos'][0]['url']
                 # 'access_token': social_auth.extra_data.get('access_token'),
             }
 
