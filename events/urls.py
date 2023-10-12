@@ -14,5 +14,6 @@ urlpatterns = [
     path('events/calendar', views.CalenderView.as_view(), name='calender'),
     path('events/<str:id>/delete',views.EventDelView.as_view(), name='Delevent'),
     path('events/<str:event_id>/join/', views.JoinEvent.as_view(), name='join-event'),
-    path('<str:group_id>/events/', views.getGroupEvents.as_view(), name='join-event')
+    path('<str:group_id>/events/', views.getGroupEvents.as_view(), name='join-event'),
+    path('friends_events/',views.OtherUserGroupEvents.as_view(),name='friends_events')
 ]

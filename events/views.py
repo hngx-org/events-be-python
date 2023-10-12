@@ -1,5 +1,8 @@
+from django.urls import reverse
 from rest_framework import status, generics
 from rest_framework.generics import UpdateAPIView
+
+from users.models import User_Groups
 from .models import Events, InterestInEvents
 from django.contrib.auth.models import Group
 from .serializers import EventsSerializer, Calenderserializer, InterestInEventsSerializer, userGroupsSerializer, GetEventsSerializer
@@ -11,10 +14,13 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from social_django.models import UserSocialAuth
 
+
 class CreateEventView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
+    message = "You need to join the group to perform this action."
+
 
 
     def post(self, request, *args, **kwargs):
@@ -22,12 +28,23 @@ class CreateEventView(generics.CreateAPIView):
         if serializer.is_valid():
             user_id = request.user.id
             user = get_object_or_404(UserSocialAuth, user_id=user_id)
+            group_id = serializer.validated_data.get('group') # Assuming you're using a URL parameter for the group_id
             
-            serializer.save(creator=user)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            if group_id:
+                try:
+                    user_group = User_Groups.objects.get(group_id=group_id, members=user)
+                    serializer.save(creator=user)
+                    return Response(serializer.data, status=status.HTTP_200_OK )
+                except User_Groups.DoesNotExist:
+                    join_group_relative_url = reverse('join-group')
+                    join_group_url = request.build_absolute_uri(join_group_relative_url)
+                    return Response(
+                        {"detail": self.message},
+                        status=status.HTTP_302_FOUND,
+                        headers={'Location': join_group_url}
+                    )
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
 
 class EventsView(APIView):
     permission_classes = (IsAuthenticated,)
@@ -166,3 +183,18 @@ class JoinEvent(APIView):
             return Response({f"message": "Success! You have expressed interest in the {event.title}event."}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class OtherUserGroupEvents(generics.ListAPIView):
+    serializer_class = EventsSerializer
+
+    def get_queryset(self):
+        
+        # Get the user's groups
+        user_id = self.request.user.id
+        user = get_object_or_404(UserSocialAuth, user_id=user_id)
+        user_groups = user.Groupfriends.all()
+
+        # Get events created by other users in the same groups
+        other_user_events = Events.objects.exclude(creator=user).filter(group__in=user_groups)
+        return other_user_events
+       

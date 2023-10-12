@@ -9,7 +9,9 @@ from django.db import models
 
 class Group(models.Model):
     group_name = models.CharField(max_length=100)
-    admin = models.ForeignKey('social_django.UserSocialAuth', on_delete=models.CASCADE, related_name='admin_groups', db_column='user_id')
+    admin = models.ForeignKey(UserSocialAuth, on_delete=models.CASCADE,related_name='Groupadmin', db_column='user_id')
+    image = models.ImageField(upload_to='group_images/',blank=True, null=True)
+    friends = models.ManyToManyField(UserSocialAuth,related_name='Groupfriends')
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
 
@@ -18,6 +20,8 @@ class Group(models.Model):
             
             
 class User_Groups(models.Model):
-    user = models.ForeignKey('social_django.UserSocialAuth', on_delete=models.CASCADE)
-    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='group')
+    user = models.ForeignKey(UserSocialAuth,on_delete=models.CASCADE, )
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, )
     
+    def __str__(self):
+        return f"{self.group.group_name}"
