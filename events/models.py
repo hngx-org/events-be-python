@@ -17,6 +17,8 @@ class Events(models.Model):
     end_time = models.TimeField(blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now_add=True)
+    image = models.ImageField(upload_to='event_images/', blank=True, null=True)
+
 
     def __str__(self):
         return self.title
@@ -25,4 +27,5 @@ class Events(models.Model):
 class InterestInEvents(models.Model):
     event = models.ForeignKey(Events, on_delete=models.CASCADE)
     user = models.ForeignKey(UserSocialAuth, on_delete=models.CASCADE)
-    created_at = models.DateTimeField(auto_now_add=True)
+    create_at = models.DateTimeField(auto_now_add=True)
+

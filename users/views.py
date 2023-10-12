@@ -26,6 +26,7 @@ from django.contrib.auth import login
 from social_django.utils import psa
 from rest_framework_simplejwt.tokens import RefreshToken
 
+
 class UserProfileView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -38,12 +39,14 @@ class UserProfileView(APIView):
 
             # Extract user data from the social auth instance
             user_data = {
+                'message':'User login successful',
                 'username': user.username,
                 'email': user.email,
                 'first_name': user.first_name,
                 'last_name': user.last_name,
                 'provider': social_auth.provider,
                 'social_id': social_auth.uid,
+                #'profile_image':response['photos'][0]['url']
                 # 'access_token': social_auth.extra_data.get('access_token'),
             }
 
@@ -52,8 +55,8 @@ class UserProfileView(APIView):
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
 
-            user_data['access_token'] = access_token
-            user_data['refresh_token'] = refresh_token
+            # user_data['access_token'] = access_token
+            # user_data['refresh_token'] = refresh_token
 
             return Response(user_data, status=status.HTTP_200_OK)
 
@@ -123,7 +126,7 @@ class DeleteGroupApiView(generics.DestroyAPIView):
             return Response({"error": "user is not an admin."}, status=status.HTTP_401_UNAUTHORIZED)
     
 class GetUserGroupsApiView(generics.ListAPIView):
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
 
     queryset = Group.objects.all()
     serializer_class = Groupserializer
