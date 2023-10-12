@@ -1,3 +1,5 @@
+from django.shortcuts import render,redirect
+from django.urls import reverse
 from rest_framework import generics
 from rest_framework.response import Response
 from .serializers import Groupserializer, User_GroupsSerializer
@@ -167,7 +169,7 @@ class GetUserGroupsApiView(generics.ListAPIView):
             data = {'user groups': serializer.data}
             return Response(data, status=status.HTTP_200_OK)
         except UserSocialAuth.DoesNotExist:
-            return Response({'detail': 'UserSocialAuth not found'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except Group.DoesNotExist:
             return Response({'detail': 'No groups found for the user'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
@@ -190,21 +192,4 @@ class GetUserGroupDetail(APIView):
                 'events': events_serialize.data
             })
         return Response(group_info,status=status.HTTP_200_OK)
-# @api_view(["GET"]) 
-# def GetUserGroupsApiView(request, *args, **kwargs):
-#     method = request.method
 
-#     if method == "GET":
-#         user = request.user
-#         User = get_object_or_404(CustomUser,id=user.id)
-#         created_groups = Group.objects.filter(admin=User)
-#         serializer = Groupserializer(created_groups, many=True)
-#         return Response(serializer.data)   
-#     return Response({"error":"user does not exist"},status=status.HTTP_401_UNAUTHORIZED)
-        
-# class editUserGroup(generics.UpdateAPIView):
-#     queryset = Group.objects.all()
-#     serializer = User_GroupsSerializer
-        
-from social_django.models import UserSocialAuth
-user = UserSocialAuth.objects.all()

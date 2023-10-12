@@ -14,6 +14,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from social_django.models import UserSocialAuth
 
+
 class CreateEventView(generics.CreateAPIView):
     permission_classes = [IsAuthenticated]
     queryset = Events.objects.all()
