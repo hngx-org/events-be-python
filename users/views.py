@@ -98,16 +98,19 @@ class RetrieveGroupApiView(generics.RetrieveAPIView):
     lookup_field = 'pk'
 
     def get(self, request, pk, *args, **kwargs):
-        group = get_object_or_404(Group, pk=pk)
-        serializer = Groupserializer(group)
-        events = group.events_set.all()
-        events_serialize = EventsSerializer(events, many=True)
-        data = {
-            'group': serializer.data,
-            'events': events_serialize.data
-        }
-        return Response(data, status=status.HTTP_200_OK)
-    
+        try:
+            group = get_object_or_404(Group, pk=pk)
+            serializer = Groupserializer(group)
+            events = group.events_set.all()
+            events_serialize = EventsSerializer(events, many=True)
+            data = {
+                'group': serializer.data,
+                'events': events_serialize.data
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except:
+            return Response({"error": "no result"}, status=status.HTTP_404_NOT_FOUND)
+        
 
 
 
