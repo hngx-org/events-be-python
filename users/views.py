@@ -1,29 +1,15 @@
-from django.shortcuts import render,redirect
 from rest_framework import generics
 from rest_framework.response import Response
-from django.views import View
 from .serializers import Groupserializer
-from .models import Group, User_Groups
+from .models import Group
 from authlib.integrations.django_client import OAuth
 from rest_framework import status
-# from .authentication import IsAuthenticatedUser
 from rest_framework.views import APIView
-from rest_framework_simplejwt.views import TokenObtainPairView
-from django.core.cache import cache
-from itsdangerous import URLSafeTimedSerializer
-from rest_framework import permissions
 from rest_framework.permissions import IsAuthenticated
-from rest_framework.exceptions import AuthenticationFailed
-from django.db.models import Q
-from rest_framework.decorators import api_view
 from django.shortcuts import get_object_or_404
 from social_django.models import UserSocialAuth
-from .permissions import IsAuthenticatedSSO
 from events.serializers import userGroupsSerializerGet
-from .serializers import UserSerializer
 from events.serializers import EventsSerializer
-from django.contrib.auth import login
-from social_django.utils import psa
 from rest_framework_simplejwt.tokens import RefreshToken
 
 
@@ -55,8 +41,6 @@ class UserProfileView(APIView):
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
 
-            # user_data['access_token'] = access_token
-            # user_data['refresh_token'] = refresh_token
 
             return Response(user_data, status=status.HTTP_200_OK)
 
@@ -65,6 +49,22 @@ class UserProfileView(APIView):
         except Exception as err:
             return Response({'error': f'Error occurred: {err}'}, status=status.HTTP_401_UNAUTHORIZED)
 
+import requests
+class LogoutView(APIView):
+    permission_classes = [IsAuthenticated]
+    def post(self, request):
+        access_token = request.user.social_auth.get(provider='google-oauth2').extra_data['access_token']
+        revoke_url = f'https://accounts.google.com/o/oauth2/revoke?token={access_token}'
+        response = requests.get(revoke_url)
+        
+        if response.status_code == 200 or response.status_code == 400:
+            # Successfully logged out from Google or token is already invalid
+            request.session.clear()
+            return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
+        else:
+            # Handle other potential errors
+            error_message = response.text
+            return Response({'error': f'Failed to log out. Response: {error_message}'}, status=status.HTTP_400_BAD_REQUEST)
 
 CONF_URL = 'https://accounts.google.com/.well-known/openid-configuration'
 oauth = OAuth()
@@ -76,7 +76,7 @@ oauth.register(
     }
 )
 
-    
+
 
 class CreateGroupApiView(generics.ListCreateAPIView):
     queryset = Group.objects.all()
@@ -140,39 +140,17 @@ class GetUserGroupDetail(APIView):
     def get(self,request):
         user= get_object_or_404(UserSocialAuth,id=request.user.id)
         groups = Group.objects.filter(admin=user)
-        # groups=User_Groups.objects.filter(group=group)
         user_groupSerialize=userGroupsSerializerGet(groups,many=True)
         group_info=[{
             'groupCount':len(groups)
         }]
         for group in groups:
-            # members = group.user_set.all()
-            # members_serialize=UserSerializer(members,many=True)
             events=group.events_set.all()
             events_serialize=EventsSerializer(events,many=True)
             group_info.append({
                 'group_name': group.group_name,
-                # 'memberCount':len(members),
-                # 'members': members_serialize.data,
                 'eventCount': len(events),
                 'events': events_serialize.data
             })
         return Response(group_info,status=status.HTTP_200_OK)
-# @api_view(["GET"]) 
-# def GetUserGroupsApiView(request, *args, **kwargs):
-#     method = request.method
 
-#     if method == "GET":
-#         user = request.user
-#         User = get_object_or_404(CustomUser,id=user.id)
-#         created_groups = Group.objects.filter(admin=User)
-#         serializer = Groupserializer(created_groups, many=True)
-#         return Response(serializer.data)   
-#     return Response({"error":"user does not exist"},status=status.HTTP_401_UNAUTHORIZED)
-        
-# class editUserGroup(generics.UpdateAPIView):
-#     queryset = Group.objects.all()
-#     serializer = User_GroupsSerializer
-        
-from social_django.models import UserSocialAuth
-user = UserSocialAuth.objects.all()
