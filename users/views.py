@@ -11,7 +11,7 @@ from events.serializers import userGroupsSerializerGet
 from events.serializers import EventsSerializer
 from django.urls import reverse
 import requests
-
+from.models import CustomUser
 
 class UserProfileView(APIView):
     """
@@ -50,7 +50,16 @@ class UserProfileView(APIView):
             user_data['profile_image'] = picture_url
 
 
+            # Check if the user already exists by email or username
+            existing_user = CustomUser.objects.filter(email=user.email) | CustomUser.objects.filter(username=user.username)
+            if existing_user.exists():
+                pass
+            else:
+                new_user = CustomUser(username=user.username, email=user.email, profile_picture=picture_url)
+                new_user.save()
+
             return Response(user_data, status=status.HTTP_200_OK)
+
 
         except UserSocialAuth.DoesNotExist:
             return Response({'error': 'User is not connected via SSO'}, status=status.HTTP_401_UNAUTHORIZED)
