@@ -2,6 +2,7 @@ from django.contrib.auth.models import User, Group
 from rest_framework import serializers
 from .models import Events, InterestInEvents
 from comments.models import Comment
+from users.models import Group
 
 
 class EventsSerializer(serializers.ModelSerializer):
@@ -56,8 +57,11 @@ class Calenderserializer(serializers.ModelSerializer):
 class userGroupsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
-
         fields = ('id', 'name') 
+class userGroupsSerializerGet(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = ['group_name']
 
 class InterestInEventsSerializer(serializers.ModelSerializer):
     class Meta:
