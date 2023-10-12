@@ -3,9 +3,9 @@ from rest_framework import status, generics
 from rest_framework.generics import UpdateAPIView
 
 from users.models import User_Groups
-from .models import Events, InterestInEvents
+from .models import Events, InterestinEvents
 from django.contrib.auth.models import Group
-from .serializers import EventsSerializer, Calenderserializer, InterestInEventsSerializer, userGroupsSerializer, GetEventsSerializer
+from .serializers import EventsSerializer, Calenderserializer, InterestinEventsSerializer, userGroupsSerializer, GetEventsSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -149,7 +149,7 @@ class CalenderView(generics.RetrieveAPIView):
     queryset= Events.objects.all()
     serializer_class = Calenderserializer
     def retrieve(self, request, *args, **kwargs):
-        Interests= InterestInEvents.objects.filter(user=get_object_or_404(UserSocialAuth,id=request.user.id))
+        Interests= InterestinEvents.objects.filter(user=get_object_or_404(UserSocialAuth,id=request.user.id))
         data=[]
         for interest in Interests:
             event=interest.event
@@ -174,11 +174,11 @@ class JoinEvent(APIView):
         
         user = get_object_or_404(UserSocialAuth, user_id=user_id)
          
-        serializer = InterestInEventsSerializer(data=request.data, context={'event': event, 'user': user})
+        serializer = InterestinEventsSerializer(data=request.data, context={'event': event, 'user': user})
 
         if serializer.is_valid():
             
-            InterestInEvents.objects.get_or_create(event=event, user=user)
+            InterestinEvents.objects.get_or_create(event=event, user=user)
             return Response({f"message": "Success! You have expressed interest in the {event.title} event."}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -190,10 +190,10 @@ class LeaveEvent(APIView):
         user_id = request.user.id
         user = get_object_or_404(UserSocialAuth, user_id=user_id)
         try:
-            interest = InterestInEvents.objects.get(event=event, user=user)
+            interest = InterestinEvents.objects.get(event=event, user=user)
             interest.delete()
             return Response({"message": "You have successfully deleted your interest in this event."}, status=status.HTTP_204_NO_CONTENT)
-        except InterestInEvents.DoesNotExist:
+        except InterestinEvents.DoesNotExist:
             return Response({"message": "You have not expressed interest in this event."}, status=status.HTTP_404_NOT_FOUND)
         
 class OtherUserGroupEvents(generics.ListAPIView):
@@ -209,4 +209,4 @@ class OtherUserGroupEvents(generics.ListAPIView):
         # Get events created by other users in the same groups
         other_user_events = Events.objects.exclude(creator=user).filter(group__in=user_groups)
         return other_user_events
-               
+                       
