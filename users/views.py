@@ -36,6 +36,7 @@ class UserProfileView(APIView):
 
             # Extract user data from the social auth instance
             user_data = {
+                'message':'User login successful',
                 'username': user.username,
                 'email': user.email,
                 'first_name': user.first_name,
@@ -50,8 +51,8 @@ class UserProfileView(APIView):
             access_token = str(refresh.access_token)
             refresh_token = str(refresh)
 
-            user_data['access_token'] = access_token
-            user_data['refresh_token'] = refresh_token
+            # user_data['access_token'] = access_token
+            # user_data['refresh_token'] = refresh_token
 
             return Response(user_data, status=status.HTTP_200_OK)
 
