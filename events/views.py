@@ -153,3 +153,5 @@ class JoinEvent(APIView):
                 return Response({"message: Authentication required to express interest in the event, PLEASE REGISTER!. "}, status=status.HTTP_401_UNAUTHORIZED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+
