@@ -3,6 +3,8 @@ from rest_framework import serializers
 from .models import Events, InterestInEvents
 from comments.models import Comment
 from users.models import Group
+from social_django.models import UserSocialAuth
+
 
 
 class EventsSerializer(serializers.ModelSerializer):
@@ -64,6 +66,9 @@ class userGroupsSerializerGet(serializers.ModelSerializer):
         fields = ['group_name']
 
 class InterestInEventsSerializer(serializers.ModelSerializer):
+    event = serializers.PrimaryKeyRelatedField(queryset=Events.objects.all(), required=False)
+    user = serializers.PrimaryKeyRelatedField(queryset=UserSocialAuth.objects.all(), required=False)
+
     class Meta:
         model = InterestInEvents
         fields = '__all__'
