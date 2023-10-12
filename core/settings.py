@@ -37,51 +37,48 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    
+    'social_django',
+    'rest_framework_social_oauth2',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "rest_framework",
     'users',
     'events',
     'drf_yasg',
     "corsheaders",
-    "rest_framework",
     'comments',
-    "allauth",
+
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
 ]
 
-# SOCIALACCOUNT_AUTO_SIGNUP = True
+# AUTH_USER_MODEL = 'users.UserSocialAuth'
 
-# AUTHENTICATION_BACKENDS = [
-#     'django.contrib.auth.backends.ModelBackend',
-# ]
-
-# REST_FRAMEWORK = {
-#     'DEFAULT_PERMISSION_CLASSES': [
-#         'rest_framework.permissions.AllowAny',
-#     ],
-#     'DEFAULT_PARSER_CLASSES': [
-#         'rest_framework.parsers.JSONParser',
-#         'rest_framework.parsers.FormParser',
-#         'rest_framework.parsers.MultiPartParser',
-#     ],
-#     'DEFAULT_AUTHENTICATION_CLASSES': [
-#         'rest_framework.authentication.BasicAuthentication',
-#         'rest_framework.authentication.SessionAuthentication',
-#     ],
-
-# }
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        "rest_framework_simplejwt.authentication.JWTAuthentication",
-        
+        'users.utils.CsrfExemptSessionAuthentication',
     ),
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+    )
 }
+# CsrfExemptSessionAuthentication
+
+AUTHENTICATION_BACKENDS = (
+    'social_core.backends.google.GoogleOAuth2',
+    'django.contrib.auth.backends.ModelBackend',
+)
+
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+# LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = '/api/profile/'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -91,7 +88,6 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'corsheaders.middleware.CorsMiddleware',                          
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -129,19 +125,30 @@ DATABASES = {
         'USER': config('PGUSER'),
         'PASSWORD': config('PGPASSWORD'),
         'HOST': config('PGHOST'),
-        'PORT': '5432',
+       'PORT': '5432',
     }
 }
 
 
-AUTH_USER_MODEL = 'users.CustomUser'
+# DB_PW = os.getenv('DB_PW')
 
-AUTHENTICATION_BACKENDS = (
-    # ...
-    #'allauth.account.auth_backends.AuthenticationBackend',
-    'django.contrib.auth.backends.ModelBackend',
-    # ...
-)
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.mysql',
+#         'NAME': 'events',
+#         'USER': 'root',
+#         'PASSWORD': DB_PW,
+#         'HOST':'localhost',
+#         'PORT':'3306',
+#         'OPTIONS':{
+#             'autocommit':True
+#         }
+#     }
+# }
+
+
+
+
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
@@ -174,14 +181,6 @@ USE_I18N = True
 USE_TZ = True
 
 
-# Static files (CSS, JavaScript, Images)
-# https://docs.djangoproject.com/en/4.2/howto/static-files/
-
-# STATIC_URL = '/static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# STATICFILE_DIRS = [
-#     BASE_DIR / 'static'
-#     ]
 
 STATIC_URL = 'static/'
 
@@ -209,12 +208,6 @@ SWAGGER_SETTINGS = {
         "Basic": {"type": "basic"},
         "Bearer": {"type": "apiKey", "name": "Authorization", "in": "header"},
     },
-}
-#settings for simple-jwt
-from datetime import timedelta
-SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(days=10),#determines access token expiration time
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=10),#determines refresh token expiration time
 }
 
 CORS_ORIGIN_ALLOW_ALL = True
