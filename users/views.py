@@ -126,7 +126,7 @@ class DeleteGroupApiView(generics.DestroyAPIView):
             return Response({"error": "user is not an admin."}, status=status.HTTP_401_UNAUTHORIZED)
     
 class GetUserGroupsApiView(generics.ListAPIView):
-    # permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
 
     queryset = Group.objects.all()
     serializer_class = Groupserializer
