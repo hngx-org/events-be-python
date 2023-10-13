@@ -147,23 +147,6 @@ DATABASES = {
 }
 
 
-# DB_PW = os.getenv('DB_PW')
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'events',
-#         'USER': 'root',
-#         'PASSWORD': DB_PW,
-#         'HOST':'localhost',
-#         'PORT':'3306',
-#         'OPTIONS':{
-#             'autocommit':True
-#         }
-#     }
-# }
-
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
