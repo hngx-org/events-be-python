@@ -4,6 +4,7 @@ from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework.decorators import parser_classes
 from rest_framework.parsers import JSONParser
 from social_django.models import UserSocialAuth
+from users.models import CustomUser
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -24,7 +25,7 @@ class User_GroupsSerializer(serializers.ModelSerializer):
         fields = '__all__'
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
-        model= UserSocialAuth
+        model= CustomUser
         fields = '__all__'
 class AddFriendToGroupSerializer(serializers.Serializer):
     friend_ids = serializers.ListField(

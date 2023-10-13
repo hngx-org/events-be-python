@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.urls import reverse
 from rest_framework import generics
 from rest_framework.response import Response
-from .serializers import AddFriendToGroupSerializer, Groupserializer, User_GroupsSerializer
+from .serializers import AddFriendToGroupSerializer, Groupserializer
 from .models import Group, User_Groups
 from authlib.integrations.django_client import OAuth
 from rest_framework import status
@@ -17,6 +17,7 @@ import requests
 from comments.models import Comment
 from events.models import Events
 from comments.serializers import CommentpicSerializer
+from  .models import CustomUser
 class UserProfileView(APIView):
     """
     Redirect user after signing in using SSO and return the following properties of the user as it is on social auth
@@ -54,7 +55,16 @@ class UserProfileView(APIView):
             user_data['profile_image'] = picture_url
 
 
+            # Check if the user already exists by email or username
+            existing_user = CustomUser.objects.filter(email=user.email) | CustomUser.objects.filter(username=user.username)
+            if existing_user.exists():
+                pass
+            else:
+                new_user = CustomUser(username=user.username, email=user.email, profile_picture=picture_url)
+                new_user.save()
+
             return Response(user_data, status=status.HTTP_200_OK)
+
 
         except UserSocialAuth.DoesNotExist:
             return Response({'error': 'User is not connected via SSO'}, status=status.HTTP_401_UNAUTHORIZED)
@@ -231,9 +241,9 @@ class GetUserGroupDetail(APIView):
                 'events':eventandcomment,
             })
         return Response(group_info,status=status.HTTP_200_OK)
-# class GetUserDetailView(generics.RetrieveAPIView):
-#     queryset = CustomUser.objects.all()
-#     serializer_class = UserSerializer
-#     lookup_field = 'email'
+class GetUserDetailView(generics.RetrieveAPIView):
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'email'
 
  
