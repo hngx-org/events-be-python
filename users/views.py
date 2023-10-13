@@ -2,7 +2,7 @@ from django.shortcuts import render,redirect
 from django.urls import reverse
 from rest_framework import generics
 from rest_framework.response import Response
-from .serializers import AddFriendToGroupSerializer, Groupserializer, User_GroupsSerializer
+from .serializers import AddFriendToGroupSerializer, Groupserializer
 from .models import Group, User_Groups
 from authlib.integrations.django_client import OAuth
 from rest_framework import status
@@ -10,12 +10,14 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from social_django.models import UserSocialAuth
-from events.serializers import userGroupsSerializerGet
+from users.serializers import UserSerializer
 from events.serializers import EventsSerializer
 from django.urls import reverse
 import requests
-from.models import CustomUser
-
+from comments.models import Comment
+from events.models import Events
+from comments.serializers import CommentpicSerializer
+from  .models import CustomUser
 class UserProfileView(APIView):
     """
     Redirect user after signing in using SSO and return the following properties of the user as it is on social auth
@@ -234,20 +236,34 @@ class GetUserGroupsApiView(generics.ListAPIView):
             return Response({'detail': 'An error occurred: {}'.format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class GetUserGroupDetail(APIView):
+    permission_classes=[IsAuthenticated]
     def get(self,request):
         user= get_object_or_404(UserSocialAuth,id=request.user.id)
         groups = Group.objects.filter(admin=user)
-        user_groupSerialize=userGroupsSerializerGet(groups,many=True)
         group_info=[{
             'groupCount':len(groups)
         }]
         for group in groups:
-            events=group.events_set.all()
-            events_serialize=EventsSerializer(events,many=True)
+            events=Events.objects.filter(group=group)
+            eventandcomment=[]
+            for event in events:
+                events_serialize=EventsSerializer(event)
+                comments=Comment.objects.filter(event_id=get_object_or_404(Events,id=event.id))
+                comments_serialize=CommentpicSerializer(comments,many=True)
+                event_data=events_serialize.data
+                event_data['comment']=len(comments)
+                event_data['commentpics']=comments_serialize.data
+                eventandcomment.append(event_data)
             group_info.append({
                 'group_name': group.group_name,
                 'eventCount': len(events),
-                'events': events_serialize.data
+                'events':eventandcomment,
             })
         return Response(group_info,status=status.HTTP_200_OK)
+class GetUserDetailView(generics.RetrieveAPIView):
+    permission_classes= [IsAuthenticated]
+    queryset = CustomUser.objects.all()
+    serializer_class = UserSerializer
+    lookup_field = 'email'
 
+ 

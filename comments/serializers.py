@@ -11,3 +11,7 @@ class CommentSerializer(serializers.ModelSerializer):
         extra_kwargs = {
             'comment': {'required': False} 
         }
+class CommentpicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['picture']
