@@ -22,4 +22,7 @@ class User_GroupsSerializer(serializers.ModelSerializer):
     class Meta:
         model = User_Groups
         fields = '__all__'
-
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model= UserSocialAuth
+        fields = '__all__'

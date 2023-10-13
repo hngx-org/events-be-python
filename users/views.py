@@ -8,11 +8,12 @@ from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from social_django.models import UserSocialAuth
-from events.serializers import userGroupsSerializerGet
+from users.serializers import UserSerializer
 from events.serializers import EventsSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
-
-
+from comments.models import Comment
+from events.models import Events
+from comments.serializers import CommentpicSerializer
 class UserProfileView(APIView):
     permission_classes = (IsAuthenticated,)
 
@@ -140,17 +141,29 @@ class GetUserGroupDetail(APIView):
     def get(self,request):
         user= get_object_or_404(UserSocialAuth,id=request.user.id)
         groups = Group.objects.filter(admin=user)
-        user_groupSerialize=userGroupsSerializerGet(groups,many=True)
         group_info=[{
             'groupCount':len(groups)
         }]
         for group in groups:
-            events=group.events_set.all()
-            events_serialize=EventsSerializer(events,many=True)
+            events=Events.objects.filter(group=group)
+            eventandcomment=[]
+            for event in events:
+                events_serialize=EventsSerializer(event)
+                comments=Comment.objects.filter(event_id=get_object_or_404(Events,id=event.id))
+                comments_serialize=CommentpicSerializer(comments,many=True)
+                event_data=events_serialize.data
+                event_data['comment']=len(comments)
+                event_data['commentpics']=comments_serialize.data
+                eventandcomment.append(event_data)
             group_info.append({
                 'group_name': group.group_name,
                 'eventCount': len(events),
-                'events': events_serialize.data
+                'events':eventandcomment,
             })
         return Response(group_info,status=status.HTTP_200_OK)
+# class GetUserDetailView(generics.RetrieveAPIView):
+#     queryset = CustomUser.objects.all()
+#     serializer_class = UserSerializer
+#     lookup_field = 'email'
 
+ 

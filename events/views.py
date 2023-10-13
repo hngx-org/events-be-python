@@ -43,6 +43,7 @@ class EventsView(APIView):
 
 class getEvent(APIView):
     """Handles getting event by id"""
+    permission_classes=[IsAuthenticated]
     def get(self, request, event_id):
 
         try:
@@ -56,6 +57,7 @@ class getEvent(APIView):
 
 class getGroupEvents(APIView):
     """Handles getting events in a group"""
+    permission_classes=[IsAuthenticated]
     def get(self, request, group_id):
 
         try:
@@ -72,6 +74,7 @@ class getGroupEvents(APIView):
 
 
 class UpdateEventView(UpdateAPIView):
+    permission_classes=[IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
     lookup_url_kwarg = 'event_uuid'
@@ -95,6 +98,7 @@ class SearchEventView(APIView):
     """
     Search events by keywords and return events.
     """
+    permission_classes=[IsAuthenticated]
     def get(self, request, keyword):
         try:
             events = Events.objects.filter(
@@ -111,6 +115,7 @@ class SearchEventView(APIView):
 
 
 class UpdateEventView(UpdateAPIView):
+    permission_classes=[IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
     lookup_url_kwarg = 'event_uuid'
@@ -153,6 +158,7 @@ class EventDelView(generics.DestroyAPIView):
         return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
 
 class JoinEvent(APIView):
+    permission_classes=[IsAuthenticated]
     def post(self, request, event_id):
         event = get_object_or_404(Events, id=event_id)
         user_id = request.user.id
@@ -164,12 +170,13 @@ class JoinEvent(APIView):
         if serializer.is_valid():
             
             InterestInEvents.objects.get_or_create(event=event, user=user)
-            return Response({f"message": "Success! You have expressed interest in the {event.title} event."}, status=status.HTTP_201_CREATED)
+            return Response({f"message": f"Success! You have expressed interest in the {event.title} event."}, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 
 class LeaveEvent(APIView):
+    permission_classes=[IsAuthenticated]
     def delete(self, request, event_id):
         event = get_object_or_404(Events, id=event_id)
         user_id = request.user.id

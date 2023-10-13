@@ -17,6 +17,7 @@ urlpatterns = [
     path('group/<int:pk>/',views.RetrieveGroupApiView.as_view(),name='retrieve_group'),
     path('user_groups/',views.GetUserGroupsApiView.as_view(),name='get_user_group'),
     path('user_groups/detail',views.GetUserGroupDetail.as_view(),name='get_user_group_detail'),
+    # path('user/<str:email>/',views.GetUserDetailView.as_view(),name='get_user_detail')
     # path('edit-user-group/<int:pk>/', views.editUserGroup.as_view(), name='edit-user-group'),
 
 ]
