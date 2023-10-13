@@ -144,7 +144,7 @@ class AddFriendToGroup(APIView):
                 for friend_id in friend_ids:
                     print(friend_id, group)
                     User_Groups.objects.create(group=group, user=friend_id)
-                return Response(status=status.HTTP_201_CREATED)
+                return Response({"message":"friend have been Added successfully"},status=status.HTTP_201_CREATED)
             return Response({"detail":"you are not the admin of this group"},status=status.HTTP_403_FORBIDDEN)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
 

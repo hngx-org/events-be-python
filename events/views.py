@@ -32,7 +32,7 @@ class CreateEventView(generics.CreateAPIView):
             
             if group_id:
                 try:
-                    user_group = User_Groups.objects.get(group_id=group_id, members=user)
+                    user_group = User_Groups.objects.get(group_id=group_id, user=user)
                     serializer.save(creator=user)
                     return Response(serializer.data, status=status.HTTP_200_OK )
                 except User_Groups.DoesNotExist:
@@ -195,18 +195,29 @@ class LeaveEvent(APIView):
             return Response({"message": "You have successfully deleted your interest in this event."}, status=status.HTTP_204_NO_CONTENT)
         except InterestinEvents.DoesNotExist:
             return Response({"message": "You have not expressed interest in this event."}, status=status.HTTP_404_NOT_FOUND)
-        
+
 class OtherUserGroupEvents(generics.ListAPIView):
     serializer_class = EventsSerializer
 
     def get_queryset(self):
-        
-        # Get the user's groups
+        # Get the current user
         user_id = self.request.user.id
         user = get_object_or_404(UserSocialAuth, user_id=user_id)
+
+        # Get the groups that the current user is a member of
         user_groups = user.Groupfriends.all()
 
-        # Get events created by other users in the same groups
-        other_user_events = Events.objects.exclude(creator=user).filter(group__in=user_groups)
-        return other_user_events
+        # Get friends of the current user who are in the same groups
+        friends_in_same_groups = UserSocialAuth.objects.filter(
+            Groupfriends__in=user_groups
+        )
+
+        # Get events created by those friends
+        events_created_by_friends = Events.objects.filter(
+            creator__in=friends_in_same_groups
+        )
+
+        return events_created_by_friends
+
+
                        
