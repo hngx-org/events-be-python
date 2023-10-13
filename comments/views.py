@@ -18,7 +18,7 @@ from drf_yasg.utils import swagger_auto_schema  # Import swagger_auto_schema
 
 
 class CommentCreateView(APIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
     @swagger_auto_schema(  # Add this decorator to document the view
         request_body=CommentSerializer,  # Specify the serializer for the request body
@@ -62,7 +62,7 @@ class CommentCreateView(APIView):
 class CommentListAPIView(generics.ListAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, event_id):
         try:

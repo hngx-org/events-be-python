@@ -16,7 +16,7 @@ from social_django.models import UserSocialAuth
 
 
 class CreateEventView(generics.CreateAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
     message = "You need to join the group to perform this action. Ask the group admin to add you."
@@ -44,7 +44,7 @@ class CreateEventView(generics.CreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EventsView(APIView):
-    permission_classes = (IsAuthenticated,)
+    # permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         """
         Provides a get method handler that returns all events.
@@ -57,7 +57,7 @@ class EventsView(APIView):
 
 class getEvent(APIView):
     """Handles getting event by id"""
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
 
     def get(self, request, event_id):
 
@@ -72,7 +72,7 @@ class getEvent(APIView):
 
 class getGroupEvents(APIView):
     """Handles getting events in a group"""
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     def get(self, request, group_id):
 
         try:
@@ -89,7 +89,7 @@ class getGroupEvents(APIView):
 
 
 class UpdateEventView(UpdateAPIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
     lookup_url_kwarg = 'event_uuid'
@@ -113,7 +113,7 @@ class SearchEventView(APIView):
     """
     Search events by keywords and return events.
     """
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     def get(self, request, keyword):
         try:
             events = Events.objects.filter(
@@ -130,7 +130,7 @@ class SearchEventView(APIView):
 
 
 class UpdateEventView(UpdateAPIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
     lookup_url_kwarg = 'event_uuid'
@@ -164,7 +164,7 @@ class CalenderView(generics.RetrieveAPIView):
         return Response(context, status=status.HTTP_200_OK)
 
 class EventDelView(generics.DestroyAPIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     queryset= Events.objects.all()
     serializer_class=EventsSerializer
     lookup_field='id'
@@ -173,7 +173,7 @@ class EventDelView(generics.DestroyAPIView):
         return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
 
 class JoinEvent(APIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     def post(self, request, event_id):
         try:
             event = get_object_or_404(Events, id=event_id)
@@ -194,7 +194,7 @@ class JoinEvent(APIView):
         
 
 class LeaveEvent(APIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     def delete(self, request, event_id):
         try:
             event = get_object_or_404(Events, id=event_id)
