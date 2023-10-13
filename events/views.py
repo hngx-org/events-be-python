@@ -1,7 +1,7 @@
 from django.urls import reverse
 from rest_framework import status, generics
 from rest_framework.generics import UpdateAPIView
-
+from events.serializers import InterestinEventsSerializer
 from users.models import User_Groups
 from .models import Events, InterestinEvents
 from django.contrib.auth.models import Group
@@ -9,7 +9,7 @@ from .serializers import EventsSerializer, Calenderserializer, InterestinEventsS
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
-from django.db.models import Q 
+from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from social_django.models import UserSocialAuth
@@ -28,8 +28,8 @@ class CreateEventView(generics.CreateAPIView):
         if serializer.is_valid():
             user_id = request.user.id
             user = get_object_or_404(UserSocialAuth, user_id=user_id)
-            group_id = serializer.validated_data.get('group') 
-            
+            group_id = serializer.validated_data.get('group')
+
             if group_id:
                 try:
                     user_group = User_Groups.objects.get(group_id=group_id, user=user)
@@ -57,6 +57,8 @@ class EventsView(APIView):
 
 class getEvent(APIView):
     """Handles getting event by id"""
+    permission_classes = [IsAuthenticated]
+
     def get(self, request, event_id):
 
         try:
@@ -64,12 +66,13 @@ class getEvent(APIView):
             serilizer = GetEventsSerializer(event, context={'request': request})
             return Response(serilizer.data, status=status.HTTP_200_OK)
         except Exception as e:
-            return Response({"error": "event does not exist"}, status=status.
-            HTTP_404_NOT_FOUND)
+            return Response({"error": "event does not exist"},
+                            status=status.HTTP_404_NOT_FOUND)
 
 
 class getGroupEvents(APIView):
     """Handles getting events in a group"""
+    permission_classes=[IsAuthenticated]
     def get(self, request, group_id):
 
         try:
@@ -86,6 +89,7 @@ class getGroupEvents(APIView):
 
 
 class UpdateEventView(UpdateAPIView):
+    permission_classes=[IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
     lookup_url_kwarg = 'event_uuid'
@@ -109,6 +113,7 @@ class SearchEventView(APIView):
     """
     Search events by keywords and return events.
     """
+    permission_classes=[IsAuthenticated]
     def get(self, request, keyword):
         try:
             events = Events.objects.filter(
@@ -125,6 +130,7 @@ class SearchEventView(APIView):
 
 
 class UpdateEventView(UpdateAPIView):
+    permission_classes=[IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
     lookup_url_kwarg = 'event_uuid'
@@ -145,7 +151,6 @@ class UpdateEventView(UpdateAPIView):
 
 class CalenderView(generics.RetrieveAPIView):
     permission_classes=[IsAuthenticated]
-
     queryset= Events.objects.all()
     serializer_class = Calenderserializer
     def retrieve(self, request, *args, **kwargs):
@@ -168,34 +173,43 @@ class EventDelView(generics.DestroyAPIView):
         return Response({"message": "Event deleted successfully."}, status=status.HTTP_200_OK)
 
 class JoinEvent(APIView):
+    permission_classes=[IsAuthenticated]
     def post(self, request, event_id):
-        event = get_object_or_404(Events, id=event_id)
-        user_id = request.user.id
-        
-        user = get_object_or_404(UserSocialAuth, user_id=user_id)
-         
-        serializer = InterestinEventsSerializer(data=request.data, context={'event': event, 'user': user})
-
-        if serializer.is_valid():
+        try:
+            event = get_object_or_404(Events, id=event_id)
+            user_id = request.user.id
             
-            InterestinEvents.objects.get_or_create(event=event, user=user)
-            return Response({f"message": "Success! You have expressed interest in the {event.title} event."}, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            user = get_object_or_404(UserSocialAuth, user_id=user_id)
+            
+            serializer = InterestinEventsSerializer(data=request.data, context={'event': event, 'user': user})
+
+            if serializer.is_valid():
+                
+                InterestinEvents.objects.get_or_create(event=event, user=user)
+                return Response({"message": f"Success! You have expressed interest in the {event.title} event."}, status=status.HTTP_201_CREATED)
+            else:
+                return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
         
 
 class LeaveEvent(APIView):
+    permission_classes=[IsAuthenticated]
     def delete(self, request, event_id):
-        event = get_object_or_404(Events, id=event_id)
-        user_id = request.user.id
-        user = get_object_or_404(UserSocialAuth, user_id=user_id)
         try:
-            interest = InterestinEvents.objects.get(event=event, user=user)
-            interest.delete()
-            return Response({"message": "You have successfully deleted your interest in this event."}, status=status.HTTP_204_NO_CONTENT)
-        except InterestinEvents.DoesNotExist:
-            return Response({"message": "You have not expressed interest in this event."}, status=status.HTTP_404_NOT_FOUND)
-
+            event = get_object_or_404(Events, id=event_id)
+            user_id = request.user.id
+            user = get_object_or_404(UserSocialAuth, user_id=user_id)
+            try:
+                interest = InterestinEvents.objects.get(event=event, user=user)
+                interest.delete()
+                return Response({"message": "You have successfully deleted your interest in this event."}, status=status.HTTP_204_NO_CONTENT)
+            except InterestinEvents.DoesNotExist:
+                return Response({"message": "You have not expressed interest in this event."}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_404_NOT_FOUND)
+          
+         
 class OtherUserGroupEvents(generics.ListAPIView):
     serializer_class = EventsSerializer
 
@@ -220,4 +234,4 @@ class OtherUserGroupEvents(generics.ListAPIView):
         return events_created_by_friends
 
 
-                       
+

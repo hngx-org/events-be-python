@@ -12,6 +12,7 @@ from .serializers import CommentSerializer
 from events.models import Events
 from rest_framework.permissions import IsAuthenticated
 from social_django.models import UserSocialAuth
+from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema  # Import swagger_auto_schema
 
@@ -61,6 +62,7 @@ class CommentCreateView(APIView):
 class CommentListAPIView(generics.ListAPIView):
     queryset = Comment.objects.all()
     serializer_class = CommentSerializer
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, event_id):
         try:
