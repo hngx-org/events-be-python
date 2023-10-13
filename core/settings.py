@@ -77,15 +77,16 @@ AUTHENTICATION_BACKENDS = (
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
-# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 # development
-# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '552452171826-cmqllqfietp2rmie1er2oj063b1p5cil.apps.googleusercontent.com'
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+#SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '552452171826-cmqllqfietp2rmie1er2oj063b1p5cil.apps.googleusercontent.com'
+#SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 SESSION_COOKIE_SAMESITE = None
 # LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'https://hngx-event-app.vercel.app/timeline'
+#LOGIN_REDIRECT_URL = 'https://zuri-events-app.vercel.app/timeline'
+LOGIN_REDIRECT_URL = 'http://localhost:3000/timeline'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -99,6 +100,18 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'core.urls'
+
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",
+# ]
+
+CORS_ALLOW_METHODS = [
+    "GET",
+    "POST",
+    "PUT",
+    "DELETE",
+    "OPTIONS"
+]
 
 TEMPLATES = [
     {
@@ -163,7 +176,6 @@ DATABASES = {
 #     }
 # }
 
-
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
 
@@ -219,7 +231,8 @@ SWAGGER_SETTINGS = {
 # CORS_ORIGIN_ALLOW_ALL = True
 CORS_URLS_REGEX = r"^/api/.*"
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',]
+    'http://localhost:3000',
+    'https://zuri-events-app.vercel.app',]
 
 AWS_ACCESS_KEY_ID = config('AWS_ACCESS_KEY_ID')
 AWS_SECRET_ACCESS_KEY = config('AWS_SECRET_ACCESS_KEY')
