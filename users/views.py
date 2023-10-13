@@ -163,6 +163,25 @@ class RetrieveGroupApiView(generics.RetrieveAPIView):
     serializer_class = Groupserializer
     lookup_field = 'pk'
 
+    def get(self, request, pk, *args, **kwargs):
+        try:
+            group = get_object_or_404(Group, pk=pk)
+            serializer = Groupserializer(group)
+            events = group.events_set.all()
+            events_serialize = EventsSerializer(events, many=True)
+            data = {
+                'group': serializer.data,
+                'events': events_serialize.data
+            }
+            return Response(data, status=status.HTTP_200_OK)
+        except:
+            return Response({"error": "no result"}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+
+
+
 class UpdateGroupApiView(generics.UpdateAPIView):
     permission_classes=[IsAuthenticated]
     queryset = Group.objects.all()
