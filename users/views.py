@@ -104,7 +104,7 @@ class LogoutView(APIView):
     """ 
         Get and revoke the session token to log user out.
     """
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     def post(self, request):
         access_token = request.user.social_auth.get(provider='google-oauth2').extra_data['access_token']
         revoke_url = f'https://accounts.google.com/o/oauth2/revoke?token={access_token}'
@@ -160,7 +160,7 @@ class AddFriendToGroup(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
 
 class RetrieveGroupApiView(generics.RetrieveAPIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     queryset = Group.objects.all()
     serializer_class = Groupserializer
     lookup_field = 'pk'
@@ -185,7 +185,7 @@ class RetrieveGroupApiView(generics.RetrieveAPIView):
 
 
 class UpdateGroupApiView(generics.UpdateAPIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     queryset = Group.objects.all()
     serializer_class = Groupserializer
     lookup_field = 'pk'
@@ -201,7 +201,7 @@ class UpdateGroupApiView(generics.UpdateAPIView):
             return Response({"error": "user can't be found."}, status=status.HTTP_401_UNAUTHORIZED)
     
 class DeleteGroupApiView(generics.DestroyAPIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     queryset = Group.objects.all()
     serializer_class = Groupserializer
     lookup_field = 'pk'
@@ -218,7 +218,7 @@ class DeleteGroupApiView(generics.DestroyAPIView):
 
       
 class GetUserGroupsApiView(generics.ListAPIView):
-    permission_classes = [IsAuthenticated]
+    # permission_classes = [IsAuthenticated]
     serializer_class = Groupserializer
 
     def get(self, request, *args, **kwargs):
@@ -236,7 +236,7 @@ class GetUserGroupsApiView(generics.ListAPIView):
             return Response({'detail': 'An error occurred: {}'.format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class GetUserGroupDetail(APIView):
-    permission_classes=[IsAuthenticated]
+    # permission_classes=[IsAuthenticated]
     def get(self,request):
         user= get_object_or_404(UserSocialAuth,id=request.user.id)
         groups = Group.objects.filter(admin=user)
@@ -261,7 +261,7 @@ class GetUserGroupDetail(APIView):
             })
         return Response(group_info,status=status.HTTP_200_OK)
 class GetUserDetailView(generics.RetrieveAPIView):
-    permission_classes= [IsAuthenticated]
+    # permission_classes= [IsAuthenticated]
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'email'
