@@ -1,7 +1,10 @@
+from django.shortcuts import render,redirect
+from django.urls import reverse
 from rest_framework import generics
 from rest_framework.response import Response
-from .serializers import Groupserializer
-from .models import Group
+from .serializers import AddFriendToGroupSerializer, Groupserializer, User_GroupsSerializer
+from .models import Group, User_Groups
+from authlib.integrations.django_client import OAuth
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.permissions import IsAuthenticated
@@ -114,24 +117,52 @@ class CreateGroupApiView(generics.ListCreateAPIView):
         serializer = Groupserializer(data=request.data)
         if serializer.is_valid():
             user_id = request.user.id
-            admin_instance = get_object_or_404(UserSocialAuth, user_id=user_id)
-            serializer.save(admin=admin_instance)
+            user = get_object_or_404(UserSocialAuth, user_id=user_id)
+            instance=serializer.save(admin=user)
+            friends = serializer.validated_data.get('friends')
+            for friend in friends:
+                print(friend, instance.pk)
+                User_Groups.objects.create(group=instance, user=friend)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
+
+class AddFriendToGroup(APIView):
     
+    def post(self, request, group_id):
+        group = Group.objects.get(pk=group_id)
+        serializer = AddFriendToGroupSerializer(data=request.data)
+        user_id = request.user.id
+        user = get_object_or_404(UserSocialAuth, user_id=user_id)
+
+        if serializer.is_valid():
+            if group.admin == user:
+                friend_ids = serializer.validated_data['friend_ids']
+                
+                # Add all the friends in the list to the group
+                group.friends.add(*friend_ids)
+                group.save()
+                for friend_id in friend_ids:
+                    print(friend_id, group)
+                    User_Groups.objects.create(group=group, user=friend_id)
+                return Response({"message":"friend have been Added successfully"},status=status.HTTP_201_CREATED)
+            return Response({"detail":"you are not the admin of this group"},status=status.HTTP_403_FORBIDDEN)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
 
 class RetrieveGroupApiView(generics.RetrieveAPIView):
+    permission_classes=[IsAuthenticated]
     queryset = Group.objects.all()
     serializer_class = Groupserializer
     lookup_field = 'pk'
 
 class UpdateGroupApiView(generics.UpdateAPIView):
+    permission_classes=[IsAuthenticated]
     queryset = Group.objects.all()
     serializer_class = Groupserializer
     lookup_field = 'pk'
 
     def perform_update(self, serializer):
-        user = self.request.user
+        user_id = self.request.user.id
+        user = get_object_or_404(UserSocialAuth, user_id=user_id)
         group = self.get_object()  
         if group.admin == user:
             serializer.save()
@@ -140,29 +171,39 @@ class UpdateGroupApiView(generics.UpdateAPIView):
             return Response({"error": "user can't be found."}, status=status.HTTP_401_UNAUTHORIZED)
     
 class DeleteGroupApiView(generics.DestroyAPIView):
+    permission_classes=[IsAuthenticated]
     queryset = Group.objects.all()
     serializer_class = Groupserializer
     lookup_field = 'pk'
 
     def perform_destroy(self, instance):
-        user = self.request.user
+        user_id = self.request.user.id
+        user = get_object_or_404(UserSocialAuth, user_id=user_id)
         group = self.get_object()  
         if group.admin == user:
             super().perform_destroy(instance)
-            return Response({"message": "group deleted successfully."}, status=status.HTTP_2 )
+            return Response({"message": "group deleted successfully."}, status=status.HTTP_204_NO_CONTENT )
         else:
             return Response({"error": "user is not an admin."}, status=status.HTTP_401_UNAUTHORIZED)
-    
-class GetUserGroupsApiView(generics.ListAPIView):
-    permission_classes=[IsAuthenticated]
 
-    queryset = Group.objects.all()
+      
+class GetUserGroupsApiView(generics.ListAPIView):
+    permission_classes = [IsAuthenticated]
     serializer_class = Groupserializer
+
     def get(self, request, *args, **kwargs):
-        created_groups= Group.objects.filter(admin=get_object_or_404(UserSocialAuth,id=request.user.id))
-        serializer = Groupserializer(created_groups, many=True)
-        data = {'user groups': serializer.data}
-        return Response(data, status=status.HTTP_200_OK)
+        try:
+            user_social_auth = get_object_or_404(UserSocialAuth, id=request.user.id)
+            created_groups = Group.objects.filter(admin=user_social_auth)
+            serializer = Groupserializer(created_groups, many=True)
+            data = {'user groups': serializer.data}
+            return Response(data, status=status.HTTP_200_OK)
+        except UserSocialAuth.DoesNotExist:
+            return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+        except Group.DoesNotExist:
+            return Response({'detail': 'No groups found for the user'}, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({'detail': 'An error occurred: {}'.format(str(e))}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class GetUserGroupDetail(APIView):
     def get(self,request):
