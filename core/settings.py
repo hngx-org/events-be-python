@@ -85,7 +85,8 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 SESSION_COOKIE_SAMESITE = None
 # LOGIN_URL = 'login'
-LOGIN_REDIRECT_URL = 'https://hngx-event-app.vercel.app/timeline'
+LOGIN_REDIRECT_URL = 'https://zuri-events-app.vercel.app/timeline'
+#LOGIN_REDIRECT_URL = 'http://localhost:3000/timeline'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -145,23 +146,6 @@ DATABASES = {
     'PORT': '5432',
   }
 }
-
-
-# DB_PW = os.getenv('DB_PW')
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'events',
-#         'USER': 'root',
-#         'PASSWORD': DB_PW,
-#         'HOST':'localhost',
-#         'PORT':'3306',
-#         'OPTIONS':{
-#             'autocommit':True
-#         }
-#     }
-# }
 
 
 # Password validation

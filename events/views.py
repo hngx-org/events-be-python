@@ -76,7 +76,7 @@ class getGroupEvents(APIView):
     def get(self, request, group_id):
 
         try:
-            get_object_or_404(Group, pk=group_id)
+           # get_object_or_404(Group, pk=group_id)
             event = Events.objects.filter(group=group_id)
             serilizer = GetEventsSerializer(event, context={'request': request}, many=True)
             if not event.exists():
