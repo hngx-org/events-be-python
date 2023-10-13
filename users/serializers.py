@@ -15,7 +15,7 @@ class Groupserializer(serializers.ModelSerializer):
     admin = serializers.CharField(read_only = True)
     class Meta:
         model = Group
-        fields = ['pk','group_name','admin','created_at','updated_at']
+        fields = ['pk','group_name','admin','image','friends','created_at','updated_at']
         
 
 class User_GroupsSerializer(serializers.ModelSerializer):
@@ -26,3 +26,7 @@ class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model= UserSocialAuth
         fields = '__all__'
+class AddFriendToGroupSerializer(serializers.Serializer):
+    friend_ids = serializers.ListField(
+        child=serializers.PrimaryKeyRelatedField(queryset=UserSocialAuth.objects.all())
+    )

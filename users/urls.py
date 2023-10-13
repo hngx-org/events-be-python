@@ -5,7 +5,7 @@ from users import views
 urlpatterns = [
     # path('user/', views.UserView.as_view(), name="user_list"),
     # path('user/<str:id>/', views.SingleUserView.as_view(),name="user_detail"),
-    
+    path('auth/google/login/', views.GoogleLoginView.as_view(), name='google-login'),
     path('auth/logout/', views.LogoutView.as_view(), name='logout'),
 
     path('profile/', views.UserProfileView.as_view(), name='login'),
@@ -17,6 +17,7 @@ urlpatterns = [
     path('group/<int:pk>/',views.RetrieveGroupApiView.as_view(),name='retrieve_group'),
     path('user_groups/',views.GetUserGroupsApiView.as_view(),name='get_user_group'),
     path('user_groups/detail',views.GetUserGroupDetail.as_view(),name='get_user_group_detail'),
+    path('groups/add_friend/<int:group_id>/', views.AddFriendToGroup.as_view(), name='add_friend_to_group'),
     # path('user/<str:email>/',views.GetUserDetailView.as_view(),name='get_user_detail')
     # path('edit-user-group/<int:pk>/', views.editUserGroup.as_view(), name='edit-user-group'),
 
