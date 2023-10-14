@@ -28,7 +28,7 @@ schema_view = get_schema_view(
     openapi.Info(
         title="Eventpy API",
         default_version='v1',
-        description="Api for the HNGx event app", 
+        description="Api for the HNGx event app",
     ),
     public=True,
     permission_classes=(permissions.AllowAny,),
@@ -36,10 +36,10 @@ schema_view = get_schema_view(
 
 
 
-urlpatterns = [ 
+urlpatterns = [
     path('admin/', admin.site.urls),
-
-    re_path(r'^auth/', include('social_django.urls', namespace='social')),
+    re_path(r'^auth/', include('drf_social_oauth2.urls', namespace='drf')),
+    # re_path(r'^auth/', include('social_django.urls', namespace='social')),
     # path('auth/login/google-oauth2/', include('social_django.urls', namespace='social')),
     path('api/', include('users.urls')),
     path("api/", include("comments.urls")),
@@ -56,4 +56,4 @@ urlpatterns = [
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)
     urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
-    
+
