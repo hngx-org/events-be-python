@@ -282,4 +282,8 @@ class GetUserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
     lookup_field = 'email'
 
- 
+class GetUserDetailViews(APIView):
+    def get(self,request,email):
+        user=get_object_or_404(CustomUser,email=email)
+        serializer=UserSerializer(user)
+        return Response(serializer.data,status=status.HTTP_200_OK)
