@@ -13,15 +13,11 @@ from rest_framework.permissions import IsAuthenticated
 from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
-<<<<<<< HEAD
-=======
-from social_django.models import UserSocialAuth
-from users.models import CustomUser, Group
->>>>>>> 15c9afced6e20341d636111aea7843a51b0a0a2e
+from users.models import *
 
 
 class CreateEventView(generics.CreateAPIView):
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
     message = "You need to join the group to perform this action. Ask the group admin to add you."
@@ -32,25 +28,16 @@ class CreateEventView(generics.CreateAPIView):
         serializer = EventsSerializer(data=request.data)
         if serializer.is_valid():
             user_id = request.user.id
-<<<<<<< HEAD
-            user = get_object_or_404(User, user_id=user_id)
-=======
-            userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
-            user = CustomUser.objects.get(email=userSoc.uid)
->>>>>>> 15c9afced6e20341d636111aea7843a51b0a0a2e
+            userSoc = get_object_or_404(User, user_id=user_id)
+            user = User.objects.get(email=userSoc.uid)
             group_id = serializer.validated_data.get('group')
 
             if group_id:
                 try:
-<<<<<<< HEAD
-                    user_group = UserGroups.objects.get(group_id=group_id, user=user)
-                    serializer.save(creator=user)
-=======
                     print(type(group_id))
                     user_group = Group.objects.get(id=group_id.pk)
                     print(user_group)
                     serializer.save(creator=user, group=group_id)
->>>>>>> 15c9afced6e20341d636111aea7843a51b0a0a2e
                     return Response(serializer.data, status=status.HTTP_200_OK )
                 except UserGroups.DoesNotExist:
                     return Response(
@@ -61,7 +48,7 @@ class CreateEventView(generics.CreateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class EventsView(APIView):
-    #permission_classes = (IsAuthenticated,)
+    permission_classes = (IsAuthenticated,)
     def get(self, request, format=None):
         """
         Provides a get method handler that returns all events.
@@ -74,7 +61,7 @@ class EventsView(APIView):
 
 class getEvent(APIView):
     """Handles getting event by id"""
-    #permission_classes = [IsAuthenticated]
+    permission_classes = [IsAuthenticated]
 
     def get(self, request, event_id):
 
@@ -89,7 +76,7 @@ class getEvent(APIView):
 
 class getGroupEvents(APIView):
     """Handles getting events in a group"""
-    #permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     def get(self, request, group_id):
 
         try:
@@ -106,7 +93,7 @@ class getGroupEvents(APIView):
 
 
 class UpdateEventView(UpdateAPIView):
-    #permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
     lookup_url_kwarg = 'event_uuid'
@@ -130,7 +117,7 @@ class SearchEventView(APIView):
     """
     Search events by keywords and return events.
     """
-    #permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     def get(self, request, keyword):
         try:
             events = Events.objects.filter(
@@ -147,7 +134,7 @@ class SearchEventView(APIView):
 
 
 class UpdateEventView(UpdateAPIView):
-   #permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     queryset = Events.objects.all()
     serializer_class = EventsSerializer
     lookup_url_kwarg = 'event_uuid'
@@ -167,18 +154,14 @@ class UpdateEventView(UpdateAPIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class CalenderView(generics.RetrieveAPIView):
-    #permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     queryset= Events.objects.all()
     serializer_class = Calenderserializer
     def retrieve(self, request, *args, **kwargs):
-<<<<<<< HEAD
-        Interests= InterestinEvents.objects.filter(user=get_object_or_404(User,id=request.user.id))
-=======
         user_id = self.request.user.id
-        userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
-        user = CustomUser.objects.get(email=userSoc.uid)
+        userSoc = get_object_or_404(User, user_id=user_id)
+        user = User.objects.get(email=userSoc.uid)
         Interests= InterestinEvents.objects.filter(user=user)
->>>>>>> 15c9afced6e20341d636111aea7843a51b0a0a2e
         data=[]
         for interest in Interests:
             event=interest.event
@@ -188,7 +171,7 @@ class CalenderView(generics.RetrieveAPIView):
         return Response(context, status=status.HTTP_200_OK)
 
 class EventDelView(generics.DestroyAPIView):
-    #permission_classes=[IsAuthenticated]
+    permission_classes=[IsAuthenticated]
     queryset= Events.objects.all()
     serializer_class=EventsSerializer
     lookup_field='id'
@@ -202,14 +185,9 @@ class JoinEvent(APIView):
         try:
             event = get_object_or_404(Events, id=event_id)
             user_id = request.user.id
-<<<<<<< HEAD
-            
+            userSoc = get_object_or_404(User, user_id=user_id)
+            user = User.objects.get(email=userSoc.uid)
             user = get_object_or_404(User, user_id=user_id)
-=======
-            userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
-            user = CustomUser.objects.get(email=userSoc.uid)
-            user = get_object_or_404(UserSocialAuth, user_id=user_id)
->>>>>>> 15c9afced6e20341d636111aea7843a51b0a0a2e
             
             serializer = InterestinEventsSerializer(data=request.data, context={'event': event, 'user': user})
 
@@ -229,12 +207,8 @@ class LeaveEvent(APIView):
         try:
             event = get_object_or_404(Events, id=event_id)
             user_id = request.user.id
-<<<<<<< HEAD
-            user = get_object_or_404(User, user_id=user_id)
-=======
-            userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
-            user = CustomUser.objects.get(email=userSoc.uid)
->>>>>>> 15c9afced6e20341d636111aea7843a51b0a0a2e
+            userSoc = get_object_or_404(User, user_id=user_id)
+            user = User.objects.get(email=userSoc.uid)
             try:
                 interest = InterestinEvents.objects.get(event=event, user=user)
                 interest.delete()
