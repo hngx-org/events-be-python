@@ -4,7 +4,8 @@ from rest_framework.generics import UpdateAPIView
 from events.serializers import InterestinEventsSerializer
 from users.models import User_Groups
 from .models import Events, InterestinEvents
-from django.contrib.auth.models import Group
+#from django.contrib.auth.models import Group
+
 from .serializers import EventsSerializer, Calenderserializer, InterestinEventsSerializer, userGroupsSerializer, GetEventsSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
@@ -13,6 +14,7 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from social_django.models import UserSocialAuth
+from users.models import CustomUser, Group
 
 
 class CreateEventView(generics.CreateAPIView):
@@ -27,13 +29,16 @@ class CreateEventView(generics.CreateAPIView):
         serializer = EventsSerializer(data=request.data)
         if serializer.is_valid():
             user_id = request.user.id
-            user = get_object_or_404(UserSocialAuth, user_id=user_id)
+            userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+            user = CustomUser.objects.get(email=userSoc.uid)
             group_id = serializer.validated_data.get('group')
 
             if group_id:
                 try:
-                    user_group = User_Groups.objects.get(group_id=group_id, user=user)
-                    serializer.save(creator=user)
+                    print(type(group_id))
+                    user_group = Group.objects.get(id=group_id.pk)
+                    print(user_group)
+                    serializer.save(creator=user, group=group_id)
                     return Response(serializer.data, status=status.HTTP_200_OK )
                 except User_Groups.DoesNotExist:
                     return Response(
@@ -154,7 +159,10 @@ class CalenderView(generics.RetrieveAPIView):
     queryset= Events.objects.all()
     serializer_class = Calenderserializer
     def retrieve(self, request, *args, **kwargs):
-        Interests= InterestinEvents.objects.filter(user=get_object_or_404(UserSocialAuth,id=request.user.id))
+        user_id = self.request.user.id
+        userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+        user = CustomUser.objects.get(email=userSoc.uid)
+        Interests= InterestinEvents.objects.filter(user=user)
         data=[]
         for interest in Interests:
             event=interest.event
@@ -178,7 +186,8 @@ class JoinEvent(APIView):
         try:
             event = get_object_or_404(Events, id=event_id)
             user_id = request.user.id
-            
+            userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+            user = CustomUser.objects.get(email=userSoc.uid)
             user = get_object_or_404(UserSocialAuth, user_id=user_id)
             
             serializer = InterestinEventsSerializer(data=request.data, context={'event': event, 'user': user})
@@ -199,7 +208,8 @@ class LeaveEvent(APIView):
         try:
             event = get_object_or_404(Events, id=event_id)
             user_id = request.user.id
-            user = get_object_or_404(UserSocialAuth, user_id=user_id)
+            userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+            user = CustomUser.objects.get(email=userSoc.uid)
             try:
                 interest = InterestinEvents.objects.get(event=event, user=user)
                 interest.delete()

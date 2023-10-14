@@ -126,26 +126,30 @@ class CreateGroupApiView(generics.ListCreateAPIView):
 
     def perform_create(self, serializer):
         user_id = self.request.user.id
-        user = get_object_or_404(UserSocialAuth, user_id=user_id)
+        userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+        user = CustomUser.objects.get(email=userSoc.uid)
         instance = serializer.save(admin=user)
         instance.friends.add(user)
         friend_emails = serializer.validated_data.pop('friend_emails')
+        print(friend_emails)
         for email in friend_emails:
             try:
-                friend = UserSocialAuth.objects.get(uid=email)
+                friend = CustomUser.objects.get(email=email)
+                print(friend)
                 instance.friends.add(friend)
-                User_Groups.objects.create(group=instance, user=friend)
+                print("hi")
+                Ge = User_Groups.objects.create(group=instance, user=friend)
             except user.DoesNotExist:
                 return Response({"a user you are trying to add does not exist"},status=status.HTTP_404_NOT_FOUND)
 
-    def post(self, request, *args, **kwargs):
-        serializer = Groupserializer(data=request.data)
-        if serializer.is_valid():
-            user_id = request.user.id
-            user = get_object_or_404(UserSocialAuth, user_id=user_id)
-            self.perform_create(serializer)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    # def post(self, request, *args, **kwargs):
+    #     serializer = Groupserializer(data=request.data)
+    #     if serializer.is_valid():
+    #         user_id = request.user.id
+    #         user = get_object_or_404(UserSocialAuth, user_id=user_id)
+    #         self.perform_create(serializer)
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class AddFriendToGroup(generics.CreateAPIView):
     serializer_class = AddFriendToGroupSerializer
