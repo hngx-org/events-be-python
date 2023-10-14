@@ -158,14 +158,15 @@ class AddFriendToGroup(generics.CreateAPIView):
         group = Group.objects.get(pk=group_id)
         serializer = AddFriendToGroupSerializer(data=request.data)
         user_id = request.user.id
-        user = get_object_or_404(UserSocialAuth, user_id=user_id)
+        userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+        user = CustomUser.objects.get(email=userSoc.uid)
 
         if serializer.is_valid():
             if group.admin == user:
                 friend_emails = serializer.validated_data.get('friend_emails')
                 for email in friend_emails:
                     try:
-                        friend = UserSocialAuth.objects.get(uid=email)
+                        friend = CustomUser.objects.get(uid=email)
                         group.friends.add(friend)
                         User_Groups.objects.create(group=group, user=friend)
                     except user.DoesNotExist:
