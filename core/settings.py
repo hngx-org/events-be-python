@@ -51,7 +51,9 @@ INSTALLED_APPS = [
     'comments',
     "allauth",
     'rest_framework_simplejwt',
-    'rest_framework_simplejwt.token_blacklist'
+    'rest_framework_simplejwt.token_blacklist',
+    'cloudinary',
+    'cloudinary_storage'
 ]
 
 # SOCIALACCOUNT_AUTO_SIGNUP = True
@@ -222,3 +224,13 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dy2kqg5by',
+    'API_KEY': '961195596386852',
+    'API_SECRET': '9zsRt1gqO3nQhE_XEzteg1dwFCU' 
+}
+
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
