@@ -1,6 +1,5 @@
 from datetime import datetime
 from django.forms import ValidationError
-from rest_framework.decorators import api_view, authentication_classes, permission_classes, parser_classes
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
@@ -11,7 +10,6 @@ from .models import Comment
 from .serializers import CommentSerializer
 from events.models import Events
 from rest_framework.permissions import IsAuthenticated
-from social_django.models import UserSocialAuth
 from django.core.exceptions import ValidationError
 from rest_framework.views import APIView
 from drf_yasg.utils import swagger_auto_schema  # Import swagger_auto_schema

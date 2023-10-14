@@ -37,8 +37,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
-
-    'social_django',
+    'social_auth',
     'rest_framework_social_oauth2',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -57,16 +56,16 @@ INSTALLED_APPS = [
     'rest_framework_simplejwt.token_blacklist',
 ]
 
-# AUTH_USER_MODEL = 'users.UserSocialAuth'
+AUTH_USER_MODEL = 'users.User'
 
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'users.utils.CsrfExemptSessionAuthentication',
     ),
-    'DEFAULT_RENDERER_CLASSES': (
-        'rest_framework.renderers.JSONRenderer',
-    )
+    # 'DEFAULT_RENDERER_CLASSES': (
+    #     # 'rest_framework.renderers.JSONRenderer',
+    # )
 }
 
 AUTHENTICATION_BACKENDS = (
@@ -149,32 +148,32 @@ DATABASES = {
     #    'PORT': '5432',
     # }
 
-  'default': {
-    'ENGINE': 'django.db.backends.postgresql',
-    'NAME': 'neondb',
-    'USER': 'oluwatimileyin0518',
-    'PASSWORD': 'j6m8DUgQMiuR',
-    'HOST': 'ep-dawn-resonance-23183028.us-east-2.aws.neon.tech',
-    'PORT': '5432',
-  }
+#   'default': {
+#     'ENGINE': 'django.db.backends.postgresql',
+#     'NAME': 'neondb',
+#     'USER': 'oluwatimileyin0518',
+#     'PASSWORD': 'j6m8DUgQMiuR',
+#     'HOST': 'ep-dawn-resonance-23183028.us-east-2.aws.neon.tech',
+#     'PORT': '5432',
+#   }
 }
 
 
-# DB_PW = os.getenv('DB_PW')
+DB_PW = os.getenv('DB_PW')
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.mysql',
-#         'NAME': 'events',
-#         'USER': 'root',
-#         'PASSWORD': DB_PW,
-#         'HOST':'localhost',
-#         'PORT':'3306',
-#         'OPTIONS':{
-#             'autocommit':True
-#         }
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'events',
+        'USER': 'root',
+        'PASSWORD': DB_PW,
+        'HOST':'localhost',
+        'PORT':'3306',
+        'OPTIONS':{
+            'autocommit':True
+        }
+    }
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators

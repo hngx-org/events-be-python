@@ -3,7 +3,7 @@ from django.urls import reverse
 from rest_framework import generics
 from rest_framework.response import Response
 from .serializers import AddFriendToGroupSerializer, Groupserializer
-from .models import Group, User_Groups
+from .models import *
 from authlib.integrations.django_client import OAuth
 from rest_framework import status
 from rest_framework.views import APIView
@@ -17,7 +17,6 @@ import requests
 from comments.models import Comment
 from events.models import Events
 from comments.serializers import CommentpicSerializer
-from  .models import CustomUser
 class UserProfileView(APIView):
     """
     Redirect user after signing in using SSO and return the following properties of the user as it is on social auth
@@ -56,11 +55,11 @@ class UserProfileView(APIView):
 
 
             # Check if the user already exists by email or username
-            existing_user = CustomUser.objects.filter(email=user.email) | CustomUser.objects.filter(username=user.username)
+            existing_user = User.objects.filter(email=user.email) | User.objects.filter(username=user.username)
             if existing_user.exists():
                 pass
             else:
-                new_user = CustomUser(username=user.username, email=user.email, profile_picture=picture_url)
+                new_user = User(username=user.username, email=user.email, profile_picture=picture_url)
                 new_user.save()
 
             return Response(user_data, status=status.HTTP_200_OK)
@@ -133,7 +132,7 @@ class CreateGroupApiView(generics.ListCreateAPIView):
             friends = serializer.validated_data.get('friends')
             for friend in friends:
                 print(friend, instance.pk)
-                User_Groups.objects.create(group=instance, user=friend)
+                UserGroups.objects.create(group=instance, user=friend)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
@@ -154,7 +153,7 @@ class AddFriendToGroup(APIView):
                 group.save()
                 for friend_id in friend_ids:
                     print(friend_id, group)
-                    User_Groups.objects.create(group=group, user=friend_id)
+                    UserGroups.objects.create(group=group, user=friend_id)
                 return Response({"message":"friend have been Added successfully"},status=status.HTTP_201_CREATED)
             return Response({"detail":"you are not the admin of this group"},status=status.HTTP_403_FORBIDDEN)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
@@ -262,7 +261,7 @@ class GetUserGroupDetail(APIView):
         return Response(group_info,status=status.HTTP_200_OK)
 class GetUserDetailView(generics.RetrieveAPIView):
     permission_classes= [IsAuthenticated]
-    queryset = CustomUser.objects.all()
+    queryset = User.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'email'
 
