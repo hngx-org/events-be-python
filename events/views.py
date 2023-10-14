@@ -188,7 +188,7 @@ class JoinEvent(APIView):
             user_id = request.user.id
             userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
             user = CustomUser.objects.get(email=userSoc.uid)
-            user = get_object_or_404(UserSocialAuth, user_id=user_id)
+            # user = get_object_or_404(UserSocialAuth, user_id=user_id)
             
             serializer = InterestinEventsSerializer(data=request.data, context={'event': event, 'user': user})
 
@@ -226,13 +226,13 @@ class OtherUserGroupEvents(generics.ListAPIView):
     def get_queryset(self):
         # Get the current user
         user_id = self.request.user.id
-        user = get_object_or_404(UserSocialAuth, user_id=user_id)
-
+        userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+        user = CustomUser.objects.get(email=userSoc.uid)
         # Get the groups that the current user is a member of
         user_groups = user.Groupfriends.all()
 
         # Get friends of the current user who are in the same groups
-        friends_in_same_groups = UserSocialAuth.objects.filter(
+        friends_in_same_groups = CustomUser.objects.filter(
             Groupfriends__in=user_groups
         )
 
