@@ -278,7 +278,7 @@ class GetUserGroupDetail(APIView):
             })
         return Response(group_info,status=status.HTTP_200_OK)
 class GetUserDetailView(generics.RetrieveAPIView):
-    permission_classes= []
+    # permission_classes= []
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'email'
