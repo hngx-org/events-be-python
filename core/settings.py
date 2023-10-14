@@ -15,6 +15,7 @@ from dotenv import load_dotenv
 
 from pathlib import Path
 from decouple import config
+import cloudinary_storage
 
 # load_dotenv()
 
@@ -60,6 +61,8 @@ INSTALLED_APPS = [
     'oauth2_provider',
     'social_django',
     'drf_social_oauth2',
+    'cloudinary',
+    'cloudinary_storage',
 ]
 
 # drf-social-oauth2
@@ -265,3 +268,12 @@ CORS_ALLOWED_ORIGINS = [
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': 'dy2kqg5by',
+    'API_KEY': '961195596386852',
+    'API_SECRET': '9zsRt1gqO3nQhE_XEzteg1dwFCU' 
+}
+
+
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
