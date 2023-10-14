@@ -123,22 +123,36 @@ class LogoutView(APIView):
 class CreateGroupApiView(generics.ListCreateAPIView):
     queryset = Group.objects.all()
     serializer_class = Groupserializer
-    
-    def post(self, request, *args, **kwargs):
-        serializer = Groupserializer(data=request.data)
-        if serializer.is_valid():
-            user_id = request.user.id
-            user = get_object_or_404(UserSocialAuth, user_id=user_id)
-            instance=serializer.save(admin=user)
-            friends = serializer.validated_data.get('friends')
-            for friend in friends:
-                print(friend, instance.pk)
-                User_Groups.objects.create(group=instance, user=friend)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST) 
 
-class AddFriendToGroup(APIView):
-    
+    def perform_create(self, serializer):
+        user_id = self.request.user.id
+        userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+        user = CustomUser.objects.get(email=userSoc.uid)
+        instance = serializer.save(admin=user)
+        instance.friends.add(user)
+        friend_emails = serializer.validated_data.pop('friend_emails')
+        print(friend_emails)
+        for email in friend_emails:
+            try:
+                friend = CustomUser.objects.get(email=email)
+                print(friend)
+                instance.friends.add(friend)
+                print("hi")
+                Ge = User_Groups.objects.create(group=instance, user=friend)
+            except user.DoesNotExist:
+                return Response({"a user you are trying to add does not exist"},status=status.HTTP_404_NOT_FOUND)
+
+    # def post(self, request, *args, **kwargs):
+    #     serializer = Groupserializer(data=request.data)
+    #     if serializer.is_valid():
+    #         user_id = request.user.id
+    #         user = get_object_or_404(UserSocialAuth, user_id=user_id)
+    #         self.perform_create(serializer)
+    #         return Response(serializer.data, status=status.HTTP_201_CREATED)
+    #     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class AddFriendToGroup(generics.CreateAPIView):
+    serializer_class = AddFriendToGroupSerializer
     def post(self, request, group_id):
         group = Group.objects.get(pk=group_id)
         serializer = AddFriendToGroupSerializer(data=request.data)
@@ -147,14 +161,14 @@ class AddFriendToGroup(APIView):
 
         if serializer.is_valid():
             if group.admin == user:
-                friend_ids = serializer.validated_data['friend_ids']
-                
-                # Add all the friends in the list to the group
-                group.friends.add(*friend_ids)
-                group.save()
-                for friend_id in friend_ids:
-                    print(friend_id, group)
-                    User_Groups.objects.create(group=group, user=friend_id)
+                friend_emails = serializer.validated_data.get('friend_emails')
+                for email in friend_emails:
+                    try:
+                        friend = UserSocialAuth.objects.get(uid=email)
+                        group.friends.add(friend)
+                        User_Groups.objects.create(group=group, user=friend)
+                    except user.DoesNotExist:
+                        return Response({"a user you are trying to add does not exist"},status=status.HTTP_404_NOT_FOUND)
                 return Response({"message":"friend have been Added successfully"},status=status.HTTP_201_CREATED)
             return Response({"detail":"you are not the admin of this group"},status=status.HTTP_403_FORBIDDEN)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
