@@ -7,7 +7,7 @@ from .models import Group, User_Groups
 from authlib.integrations.django_client import OAuth
 from rest_framework import status
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated,AllowAny
 from django.shortcuts import get_object_or_404
 from social_django.models import UserSocialAuth
 from users.serializers import UserSerializer
@@ -278,12 +278,13 @@ class GetUserGroupDetail(APIView):
             })
         return Response(group_info,status=status.HTTP_200_OK)
 class GetUserDetailView(generics.RetrieveAPIView):
-    #permission_classes= [IsAuthenticated]
+    permission_classes= []
     queryset = CustomUser.objects.all()
     serializer_class = UserSerializer
     lookup_field = 'email'
 
 class GetUserDetailViews(APIView):
+     permission_classes= [AllowAny]
     def get(self,request,email):
         user=get_object_or_404(CustomUser,email=email)
         serializer=UserSerializer(user)
