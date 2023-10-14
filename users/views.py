@@ -18,6 +18,7 @@ from comments.models import Comment
 from events.models import Events
 from comments.serializers import CommentpicSerializer
 from  .models import CustomUser
+from django.db.models import Q
 class UserProfileView(APIView):
     """
     Redirect user after signing in using SSO and return the following properties of the user as it is on social auth
@@ -237,12 +238,13 @@ class GetUserGroupsApiView(generics.ListAPIView):
 
     def get(self, request, *args, **kwargs):
         try:
-            user_social_auth = get_object_or_404(UserSocialAuth, id=request.user.id)
-            created_groups = Group.objects.filter(admin=user_social_auth)
+            userSoc = get_object_or_404(UserSocialAuth, id=request.user.id)
+            user = CustomUser.objects.get(email=userSoc.uid)
+            created_groups = Group.objects.filter(admin=user)
             serializer = Groupserializer(created_groups, many=True)
             data = {'user groups': serializer.data}
             return Response(data, status=status.HTTP_200_OK)
-        except UserSocialAuth.DoesNotExist:
+        except user.DoesNotExist:
             return Response({'detail': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
         except Group.DoesNotExist:
             return Response({'detail': 'No groups found for the user'}, status=status.HTTP_404_NOT_FOUND)
@@ -252,8 +254,8 @@ class GetUserGroupsApiView(generics.ListAPIView):
 class GetUserGroupDetail(APIView):
     #permission_classes=[IsAuthenticated]
     def get(self,request):
-        user= get_object_or_404(UserSocialAuth,id=request.user.id)
-        groups = Group.objects.filter(admin=user)
+        user= get_object_or_404(CustomUser,email=request.user.email)
+        groups = Group.objects.filter(Q(admin=user) | Q(friends=user))
         group_info=[{
             'groupCount':len(groups)
         }]
