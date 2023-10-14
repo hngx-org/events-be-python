@@ -64,7 +64,11 @@ REST_FRAMEWORK = {
         'users.utils.CsrfExemptSessionAuthentication',
     ),
     # 'DEFAULT_RENDERER_CLASSES': (
+<<<<<<< HEAD
     #     # 'rest_framework.renderers.JSONRenderer',
+=======
+    #     'rest_framework.renderers.JSONRenderer',
+>>>>>>> 15c9afced6e20341d636111aea7843a51b0a0a2e
     # )
 }
 
@@ -73,8 +77,8 @@ AUTHENTICATION_BACKENDS = (
     'django.contrib.auth.backends.ModelBackend',
 )
 # localhost
-# SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
-# SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
+SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
+SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 
 SOCIAL_AUTH_GOOGLE_OAUTH2_KEY = '188658735176-jhpmkjvo54mhdd0pqdnkcqvtc22oqidk.apps.googleusercontent.com'
 SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
@@ -148,6 +152,7 @@ DATABASES = {
     #    'PORT': '5432',
     # }
 
+<<<<<<< HEAD
 #   'default': {
 #     'ENGINE': 'django.db.backends.postgresql',
 #     'NAME': 'neondb',
@@ -156,6 +161,16 @@ DATABASES = {
 #     'HOST': 'ep-dawn-resonance-23183028.us-east-2.aws.neon.tech',
 #     'PORT': '5432',
 #   }
+=======
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'neondb',
+        'USER': 'oluwatimileyin0518',
+        'PASSWORD': 'j6m8DUgQMiuR',
+        'HOST': 'ep-dawn-resonance-23183028.us-east-2.aws.neon.tech',
+        'PORT': '5432',
+    }
+>>>>>>> 15c9afced6e20341d636111aea7843a51b0a0a2e
 }
 
 
@@ -231,9 +246,9 @@ SWAGGER_SETTINGS = {
 CORS_URLS_REGEX = r"^/api/.*"
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
-    'https://zuri-events-app.vercel.app',
+    'https://zuri-events-app.vercel.app',]
 
-]
+
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

@@ -82,7 +82,7 @@ class Group(models.Model):
     updated_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
-        db_table = 'custom_group_table_name'
+        db_table = 'Group_table'
             
             
 class UserGroups(models.Model):
