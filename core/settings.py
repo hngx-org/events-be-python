@@ -176,7 +176,6 @@ DATABASES = {
         'HOST': config('PGHOST'),
        'PORT': '5432',
     }
-
     # 'default': {
     #     'ENGINE': 'django.db.backends.postgresql',
     #     'NAME': 'neondb',
