@@ -39,7 +39,7 @@ schema_view = get_schema_view(
 urlpatterns = [ 
     path('admin/', admin.site.urls),
 
-    re_path(r'^auth/', include('social_django.urls', namespace='social')),
+    # re_path(r'^auth/', include('social_django.urls', namespace='social')),
     # path('auth/login/google-oauth2/', include('social_django.urls', namespace='social')),
     path('api/', include('users.urls')),
     path("api/", include("comments.urls")),

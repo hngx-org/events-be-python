@@ -19,12 +19,7 @@ class Comment(models.Model):
     created_at = models.DateTimeField(default=datetime.utcnow)
     updated_at = models.DateTimeField(default=datetime.utcnow)
     event_id = models.ForeignKey(Events, on_delete=models.CASCADE)
-<<<<<<< HEAD
-    created_by = models.ForeignKey(User, on_delete=models.CASCADE,
-                                   default=None)
-=======
-    created_by = models.ForeignKey(UserSocialAuth, models.CASCADE, blank=True, null=True)
->>>>>>> 15c9afced6e20341d636111aea7843a51b0a0a2e
+    created_by = models.ForeignKey(User, models.CASCADE, blank=True, null=True)
     picture = models.ImageField(upload_to='comment_pictures/', null=True, blank=True)
     voice_note = models.FileField(upload_to='comment_voice_notes/', null=True, blank=True)
 

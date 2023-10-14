@@ -5,8 +5,8 @@ from users import views
 urlpatterns = [
     # path('user/', views.UserView.as_view(), name="user_list"),
     # path('user/<str:id>/', views.SingleUserView.as_view(),name="user_detail"),
-    path('auth/google/login/', views.GoogleLoginView.as_view(), name='google-login'),
-    path('auth/logout/', views.LogoutView.as_view(), name='logout'),
+    # path('auth/google/login/', views.GoogleLoginView.as_view(), name='google-login'),
+    # path('auth/logout/', views.LogoutView.as_view(), name='logout'),
 
     path('profile/', views.UserProfileView.as_view(), name='login'),
     # path('login/', views.newLoginView.as_view(), name='login'),
