@@ -86,7 +86,7 @@ SOCIAL_AUTH_GOOGLE_OAUTH2_SECRET = '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'
 SESSION_COOKIE_SAMESITE = None
 # LOGIN_URL = 'login'
 #LOGIN_REDIRECT_URL = 'https://zuri-events-app.vercel.app/timeline'
-LOGIN_REDIRECT_URL = 'http://localhost:3000/timeline'
+LOGIN_REDIRECT_URL = 'https://zuri-events-app.vercel.app/timeline'
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
