@@ -7,8 +7,10 @@ from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework import generics
 from rest_framework.validators import ValidationError
+
+from users.models import CustomUser
 from .models import Comment
-from .serializers import CommentSerializer
+from .serializers import CommentSerializer, GetCommentSerializer
 from events.models import Events
 from rest_framework.permissions import IsAuthenticated
 from social_django.models import UserSocialAuth
@@ -37,11 +39,13 @@ class CommentCreateView(APIView):
             event_id = request.data.get('event_id')  # Get event_id from request.data
             event = get_object_or_404(Events, pk=event_id)
             current_time = datetime.utcnow()
-
+            user_id = request.user.id
+            userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+            user = CustomUser.objects.get(email=userSoc.uid)
             comment_data = {
                 "comment": request.data.get('comment'),
                 "event_id": event_id,
-                "created_by": request.user.id
+                "created_by": user
             }
             
             # Extract the voice note file and handle it separately
@@ -87,7 +91,7 @@ class CommentCreateView(APIView):
         
 class CommentListAPIView(generics.ListAPIView):
     queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
+    serializer_class = GetCommentSerializer
     #permission_classes = [IsAuthenticated]
 
     def get(self, request, event_id):
