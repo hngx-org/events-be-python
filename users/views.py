@@ -284,7 +284,7 @@ class GetUserDetailView(generics.RetrieveAPIView):
     lookup_field = 'email'
 
 class GetUserDetailViews(APIView):
-     permission_classes= [AllowAny]
+    permission_classes= [AllowAny]
     def get(self,request,email):
         user=get_object_or_404(CustomUser,email=email)
         serializer=UserSerializer(user)
