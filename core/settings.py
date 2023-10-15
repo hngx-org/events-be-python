@@ -116,9 +116,9 @@ SESSION_COOKIE_SAMESITE = None
 LOGIN_REDIRECT_URL = 'https://zuri-events-app.vercel.app/timeline'
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -128,13 +128,10 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
-# CORS_URLS_REGEX = r"^/.*"
 
 CORS_ORIGIN_ALLOW_ALL = True
-
-
 CORS_ALLOWED_ORIGINS = [
-    "https://hngx-event-app.vercel.app/timeline",
+    "https://zuri-events-app.vercel.app",
     "http://localhost:3000",
 ]
 
@@ -264,11 +261,6 @@ SWAGGER_SETTINGS = {
     },
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
-# CORS_URLS_REGEX = r"^/api/.*"
-CORS_ALLOWED_ORIGINS = [
- "*"    
-]
 
 
 
