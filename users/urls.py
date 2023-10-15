@@ -24,5 +24,6 @@ urlpatterns = [
 
     # path('user/', views.sendNotification.as_view(), name='send-notification'),
     # path('edit-user-group/<int:pk>/', views.editUserGroup.as_view(), name='edit-user-group'),
+    path('contact-us/', views.ContactUsView.as_view(), name='contact_us')
 
 ]
