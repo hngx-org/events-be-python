@@ -179,12 +179,7 @@ class EventDelView(generics.DestroyAPIView):
     def destroy(self, request, *args, **kwargs):
         event = self.get_object()
         admin=event.group.admin 
-        print(self.request.user)
-        print(admin)
-        print(event.creator)
         if self.request.user.username in [event.creator.username,admin.username]:
-            print(admin)
-            print(event.creator)
             super().destroy(request, *args, **kwargs)
             return Response({"message": "event deleted successfully."}, status=status.HTTP_204_NO_CONTENT )
         else:
