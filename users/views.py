@@ -19,6 +19,16 @@ from events.models import Events
 from comments.serializers import CommentpicSerializer
 from  .models import CustomUser
 from django.db.models import Q
+import os
+from django.core.mail import send_mail
+from django.conf import settings
+import smtplib
+from django.utils import timezone
+from .models import Notification
+from .serializers import NotificationSerializer
+
+
+
 class UserProfileView(APIView):
     """
     Redirect user after signing in using SSO and return the following properties of the user as it is on social auth
@@ -290,3 +300,31 @@ class GetUserDetailViews(APIView):
         user=get_object_or_404(CustomUser,email=email)
         serializer=UserSerializer(user)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+class SingleNotificationView(generics.RetrieveAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_read = True  # Mark the notification as read
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+class AllNotificationsView(generics.ListAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+
+
+    def list(self, request, *args, **kwargs):
+        # Calculate the count of unread notifications
+        unread_count = Notification.objects.filter(is_read=False).count()
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        data = {
+            "notifications": serializer.data,
+            "unread_count": unread_count
+        }
+        return Response(data)
