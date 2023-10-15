@@ -176,11 +176,11 @@ class EventDelView(generics.DestroyAPIView):
     queryset= Events.objects.all()
     serializer_class=EventsSerializer
     lookup_field='id'
-    def perform_destroy(self, request, *args, **kwargs):
+    def destroy(self, request, *args, **kwargs):
         event = self.get_object()
         admin=event.group.admin 
-        if event.creator in [request.user,admin]:
-            super().perform_destroy(request, *args, **kwargs)
+        if self.request.user.username in [event.creator.username,admin.username]:
+            super().destroy(request, *args, **kwargs)
             return Response({"message": "event deleted successfully."}, status=status.HTTP_204_NO_CONTENT )
         else:
             return Response({"error": "user is not an admin or creator."}, status=status.HTTP_401_UNAUTHORIZED)
