@@ -259,7 +259,7 @@ SWAGGER_SETTINGS = {
 }
 
 # CORS_ORIGIN_ALLOW_ALL = True
-CORS_URLS_REGEX = r"^/api/.*"
+# CORS_URLS_REGEX = r"^/api/.*"
 CORS_ALLOWED_ORIGINS = [
     'http://localhost:3000',
     'https://zuri-events-app.vercel.app',]
