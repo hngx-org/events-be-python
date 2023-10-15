@@ -132,6 +132,13 @@ CORS_URLS_REGEX = r"^/.*"
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+
+CORS_ALLOW_HEADERS = [
+    "Accept",
+    "Authorization",
+    "Content-Type",
+]
+
 CORS_ALLOW_METHODS = [
     "GET",
     "POST",
