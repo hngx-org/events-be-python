@@ -73,7 +73,7 @@ ACTIVATE_JWT = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'users.utils.CsrfExemptSessionAuthentication',
+        'users.utils.CsrfExemptSessionAuthentication',
 
         # drf-social-oauth2
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
@@ -132,6 +132,10 @@ ROOT_URLCONF = 'core.urls'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
+
+CORS_ALLOWED_ORIGINS = [
+    "*",
+]
 
 CORS_ALLOW_METHODS = [
     "GET",
