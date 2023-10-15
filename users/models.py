@@ -38,3 +38,10 @@ class User_Groups(models.Model):
     
     def __str__(self):
         return f"{self.group.group_name}"
+
+
+class Preferences(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+    appearance = models.CharField(max_length=20, default="light")
+    language = models.CharField(max_length=225, default='english')
+    region = models.CharField(max_length=225, default="Lagos")

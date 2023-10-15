@@ -41,3 +41,11 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 class AddFriendToGroupSerializer(serializers.Serializer):
     friend_emails = serializers.ListField(child=serializers.EmailField(), write_only=True,)
+
+class AppearanceSerializer(serializers.Serializer):
+    appearance = serializers.CharField()
+
+
+class LanguageRegionSerializer(serializers.Serializer):
+    language = serializers.CharField(required=False)
+    region = serializers.CharField(required=False)
