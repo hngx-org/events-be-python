@@ -41,3 +41,12 @@ class UserSerializer(serializers.ModelSerializer):
         fields = '__all__'
 class AddFriendToGroupSerializer(serializers.Serializer):
     friend_emails = serializers.ListField(child=serializers.EmailField(), write_only=True,)
+    
+    
+from .models import Notification
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'
+

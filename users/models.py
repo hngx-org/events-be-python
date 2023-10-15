@@ -30,7 +30,7 @@ class Group(models.Model):
 
     class Meta:
         db_table = 'Group_table'
-            
+    
             
 class User_Groups(models.Model):
     user = models.ForeignKey(CustomUser,on_delete=models.CASCADE, )
@@ -38,3 +38,18 @@ class User_Groups(models.Model):
     
     def __str__(self):
         return f"{self.group.group_name}"
+    
+        
+    def save(self, *args, **kwargs):
+        super(User_Groups, self).save(args, **kwargs)
+        if True:
+            message = f"{self.admin} has added you to {self.group.group_name}"
+        
+        Notification.objects.create(user=self.user, admin=self.group.admin, message=message)
+        return message
+
+class Notification(models.Model):
+    user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, )
+    admin = models.ForeignKey(Group, on_delete=models.CASCADE,)
+    message = models.TextField(max_length=200, null=True, blank=True)
+    is_read = models.BooleanField(default=False)
