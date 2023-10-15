@@ -73,7 +73,7 @@ ACTIVATE_JWT = True
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
-        # 'users.utils.CsrfExemptSessionAuthentication',
+        'users.utils.CsrfExemptSessionAuthentication',
 
         # drf-social-oauth2
         'oauth2_provider.contrib.rest_framework.OAuth2Authentication',  # django-oauth-toolkit >= 1.0.0
@@ -116,9 +116,9 @@ SESSION_COOKIE_SAMESITE = None
 LOGIN_REDIRECT_URL = 'https://zuri-events-app.vercel.app/timeline'
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -128,9 +128,12 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",
-# ]
+
+CORS_ORIGIN_ALLOW_ALL = True
+CORS_ALLOWED_ORIGINS = [
+    "https://zuri-events-app.vercel.app",
+    "http://localhost:3000",
+]
 
 CORS_ALLOW_METHODS = [
     "GET",
@@ -258,11 +261,6 @@ SWAGGER_SETTINGS = {
     },
 }
 
-# CORS_ORIGIN_ALLOW_ALL = True
-CORS_URLS_REGEX = r"^/api/.*"
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'https://zuri-events-app.vercel.app',]
 
 
 
@@ -272,7 +270,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dy2kqg5by',
     'API_KEY': '961195596386852',
-    'API_SECRET': '9zsRt1gqO3nQhE_XEzteg1dwFCU' 
+    'API_SECRET': '9zsRt1gqO3nQhE_XEzteg1dwFCU'
 }
 
 
