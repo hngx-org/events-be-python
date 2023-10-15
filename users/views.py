@@ -24,6 +24,11 @@ from django.core.mail import send_mail
 from django.conf import settings
 import smtplib
 from django.utils import timezone
+from .models import Notification
+from .serializers import NotificationSerializer
+
+
+
 class UserProfileView(APIView):
     """
     Redirect user after signing in using SSO and return the following properties of the user as it is on social auth
@@ -297,30 +302,29 @@ class GetUserDetailViews(APIView):
         return Response(serializer.data,status=status.HTTP_200_OK)
 
 
-class sendNotification(APIView):
-    def get(self,request):
-        user = request.user
-        userEmail = user.email
-        groups = Group.objects.filter(Q(admin=user))
-        events = Events.objects.filter(Q(group__in=groups), start_date__date=timezone.now().date())
-        
-        if events:
+class SingleNotificationView(generics.RetrieveAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_read = True  # Mark the notification as read
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
-            subject = 'Event Reminder'
-            message = 'You have an event today'
-            email_from = os.getenv('EMAIL_HOST_USER')
-            recipient_list = [userEmail,]
+class AllNotificationsView(generics.ListAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
 
-            try:
-                send_mail( subject, message, email_from, recipient_list )
-                return Response({"message":"email sent successfully"},status=status.HTTP_200_OK)
-            except Exception as e:
-                return Response(f"Error sending notification: {e}",status=status.HTTP_400_BAD_REQUEST)
-            
-        else:
-            return Response({"message":"no event today"},status=status.HTTP_200_OK)
-        
 
-            
-
-        
+    def list(self, request, *args, **kwargs):
+        # Calculate the count of unread notifications
+        unread_count = Notification.objects.filter(is_read=False).count()
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        data = {
+            "notifications": serializer.data,
+            "unread_count": unread_count
+        }
+        return Response(data)
