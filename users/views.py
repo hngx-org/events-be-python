@@ -286,6 +286,9 @@ class GetUserDetailView(generics.RetrieveAPIView):
 class GetUserDetailViews(APIView):
      # permission_classes= [AllowAny]
     def get(self,request,email):
+        print(email)
+        print(CustomUser.objects.all())
         user=get_object_or_404(CustomUser,email=email)
+        print(user)
         serializer=UserSerializer(user)
         return Response(serializer.data,status=status.HTTP_200_OK)
