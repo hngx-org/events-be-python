@@ -130,10 +130,8 @@ ROOT_URLCONF = 'core.urls'
 
 
 CORS_ORIGIN_ALLOW_ALL = True
-
-
 CORS_ALLOWED_ORIGINS = [
-    "https://hngx-event-app.vercel.app/timeline",
+    "https://zuri-events-app.vercel.app",
     "http://localhost:3000",
 ]
 
@@ -263,12 +261,6 @@ SWAGGER_SETTINGS = {
     },
 }
 
-CORS_ORIGIN_ALLOW_ALL = True
-# CORS_URLS_REGEX = r"^/api/.*"
-CORS_ALLOWED_ORIGINS = [
- "http://localhost:3000",
- "https://zuri-events-app.vercel.app"
-]
 
 
 
