@@ -63,6 +63,7 @@ INSTALLED_APPS = [
     'drf_social_oauth2',
     'cloudinary',
     'cloudinary_storage',
+    'notifications',
 ]
 
 # drf-social-oauth2
@@ -275,3 +276,8 @@ CLOUDINARY_STORAGE = {
 
 
 DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+NOTIFICATIONS_SOFT_DELETE = False
+NOTIFICATIONS_USE_JSONFIELD = True
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'

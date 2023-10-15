@@ -19,6 +19,7 @@ urlpatterns = [
     path('user_groups/detail',views.GetUserGroupDetail.as_view(),name='get_user_group_detail'),
     path('groups/add_friend/<int:group_id>/', views.AddFriendToGroup.as_view(), name='add_friend_to_group'),
     path('user/<str:email>/',views.GetUserDetailViews.as_view(),name='get_user_detail'),
+    path('', views.sendNotification.as_view(), name='send-notification'),
     # path('edit-user-group/<int:pk>/', views.editUserGroup.as_view(), name='edit-user-group'),
 
 ]

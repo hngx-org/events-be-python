@@ -19,6 +19,11 @@ from events.models import Events
 from comments.serializers import CommentpicSerializer
 from  .models import CustomUser
 from django.db.models import Q
+import os
+from django.core.mail import send_mail
+from django.conf import settings
+import smtplib
+from django.utils import timezone
 class UserProfileView(APIView):
     """
     Redirect user after signing in using SSO and return the following properties of the user as it is on social auth
@@ -290,3 +295,32 @@ class GetUserDetailViews(APIView):
         user=get_object_or_404(CustomUser,email=email)
         serializer=UserSerializer(user)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+class sendNotification(APIView):
+    def get(self,request):
+        user = request.user
+        userEmail = user.email
+        groups = Group.objects.filter(Q(admin=user))
+        events = Events.objects.filter(Q(group__in=groups), start_date__date=timezone.now().date())
+        
+        if events:
+
+            subject = 'Event Reminder'
+            message = 'You have an event today'
+            email_from = os.getenv('EMAIL_HOST_USER')
+            recipient_list = [userEmail,]
+
+            try:
+                send_mail( subject, message, email_from, recipient_list )
+                return Response({"message":"email sent successfully"},status=status.HTTP_200_OK)
+            except Exception as e:
+                return Response(f"Error sending notification: {e}",status=status.HTTP_400_BAD_REQUEST)
+            
+        else:
+            return Response({"message":"no event today"},status=status.HTTP_200_OK)
+        
+
+            
+
+        
