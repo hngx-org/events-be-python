@@ -128,9 +128,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
+# CORS_URLS_REGEX = r"^/.*"
 CORS_ALLOWED_ORIGINS = [
-    "*",
+    "*"
 ]
+CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_METHODS = [
     "GET",
@@ -258,11 +260,11 @@ SWAGGER_SETTINGS = {
     },
 }
 
-# CORS_ORIGIN_ALLOW_ALL = True
+CORS_ORIGIN_ALLOW_ALL = True
 # CORS_URLS_REGEX = r"^/api/.*"
 CORS_ALLOWED_ORIGINS = [
-    'http://localhost:3000',
-    'https://zuri-events-app.vercel.app',]
+ "*"    
+]
 
 
 
@@ -272,7 +274,7 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 CLOUDINARY_STORAGE = {
     'CLOUD_NAME': 'dy2kqg5by',
     'API_KEY': '961195596386852',
-    'API_SECRET': '9zsRt1gqO3nQhE_XEzteg1dwFCU' 
+    'API_SECRET': '9zsRt1gqO3nQhE_XEzteg1dwFCU'
 }
 
 
