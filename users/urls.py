@@ -21,6 +21,11 @@ urlpatterns = [
     path('user/<str:email>/',views.GetUserDetailViews.as_view(),name='get_user_detail'),
     path('settings/appearance/',views.AppearanceSetting.as_view(),name='set_appearance'),
     path('settings/languageregion/',views.LanguageRegionSettings.as_view(),name='set_language'),
+    path('notifications/<int:pk>/', views.SingleNotificationView.as_view(), name='single-notification'),
+    path('notifications/', views.AllNotificationsView.as_view(), name='all-notifications'),
+
+    # path('user/', views.sendNotification.as_view(), name='send-notification'),
     # path('edit-user-group/<int:pk>/', views.editUserGroup.as_view(), name='edit-user-group'),
+    path('contact-us/', views.ContactUsView.as_view(), name='contact_us')
 
 ]

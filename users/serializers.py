@@ -6,6 +6,8 @@ from rest_framework.decorators import parser_classes
 from rest_framework.parsers import JSONParser
 from social_django.models import UserSocialAuth
 from users.models import CustomUser
+from .models import Notification
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -42,6 +44,12 @@ class UserSerializer(serializers.ModelSerializer):
 class AddFriendToGroupSerializer(serializers.Serializer):
     friend_emails = serializers.ListField(child=serializers.EmailField(), write_only=True,)
 
+
+class NotificationSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notification
+        fields = '__all__'
+
 class AppearanceSerializer(serializers.Serializer):
     appearance = serializers.CharField()
 
@@ -49,3 +57,5 @@ class AppearanceSerializer(serializers.Serializer):
 class LanguageRegionSerializer(serializers.Serializer):
     language = serializers.CharField(required=False)
     region = serializers.CharField(required=False)
+
+
