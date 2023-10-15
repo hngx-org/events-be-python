@@ -128,7 +128,7 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = 'core.urls'
 
-# CORS_URLS_REGEX = r"^/.*"
+CORS_URLS_REGEX = r"^/.*"
 CORS_ALLOWED_ORIGINS = [
     "*"
 ]
