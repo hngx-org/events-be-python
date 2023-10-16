@@ -2,8 +2,8 @@ from django.shortcuts import render,redirect
 from django.urls import reverse
 from rest_framework import generics
 from rest_framework.response import Response
-from .serializers import AddFriendToGroupSerializer, Groupserializer
-from .models import Group, User_Groups
+from .serializers import AddFriendToGroupSerializer, Groupserializer, AppearanceSerializer, LanguageRegionSerializer
+from .models import Group, User_Groups, Preferences
 from authlib.integrations.django_client import OAuth
 from rest_framework import status
 from rest_framework.views import APIView
@@ -19,6 +19,14 @@ from events.models import Events
 from comments.serializers import CommentpicSerializer
 from  .models import CustomUser
 from django.db.models import Q
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import action
+from django.core.mail import send_mail
+from django.conf import settings
+from django.utils import timezone
+from .models import Notification
+from .serializers import NotificationSerializer
+
 class UserProfileView(APIView):
     """
     Redirect user after signing in using SSO and return the following properties of the user as it is on social auth
@@ -28,7 +36,7 @@ class UserProfileView(APIView):
         social_auth_provider: e.g google
         social_id: uidd associated with the user on the social_auth
         picture: profile picture of the user
-        
+
     """
     #permission_classes = (IsAuthenticated,)
 
@@ -63,6 +71,7 @@ class UserProfileView(APIView):
             else:
                 new_user = CustomUser(username=user.username, email=user.email, profile_picture=picture_url)
                 new_user.save()
+            print("ues")
 
             return Response(user_data, status=status.HTTP_200_OK)
 
@@ -84,10 +93,34 @@ class UserProfileView(APIView):
                 profile_picture = user_data.get('picture')
                 return profile_picture
             else:
-                return None  
+                return None
 
         except Exception as e:
             return None
+
+
+class ChangeProfileUser(generics.UpdateAPIView):
+    """"""
+    pass
+
+
+class ContactUsView(APIView):
+
+    def post(self, request, *args, **kwargs):
+        user = request.user
+        if user and user.email:
+            success = send_mail(
+                subject="Help and Support",
+                message="Test Help and support",
+                from_email=settings.EMAIL_HOST_USER,
+                recipient_list=[user.email],
+                fail_silently=False
+            )
+            if success:
+                return Response({"message": "Mail successful"})
+            else:
+                return Response({"message": "Mail unsuccessful"})
+        return Response({"message": "Not logged in"})
 
 
 class GoogleLoginView(APIView):
@@ -102,7 +135,7 @@ class GoogleLoginView(APIView):
 
 
 class LogoutView(APIView):
-    """ 
+    """
         Get and revoke the session token to log user out.
     """
     #permission_classes = [IsAuthenticated]
@@ -110,7 +143,7 @@ class LogoutView(APIView):
         access_token = request.user.social_auth.get(provider='google-oauth2').extra_data['access_token']
         revoke_url = f'https://accounts.google.com/o/oauth2/revoke?token={access_token}'
         response = requests.get(revoke_url)
-        
+
         if response.status_code == 200 or response.status_code == 400:
             # Successfully logged out from Google or token is already invalid
             request.session.clear()
@@ -173,7 +206,7 @@ class AddFriendToGroup(generics.CreateAPIView):
                         return Response({"a user you are trying to add does not exist"},status=status.HTTP_404_NOT_FOUND)
                 return Response({"message":"friend have been Added successfully"},status=status.HTTP_201_CREATED)
             return Response({"detail":"you are not the admin of this group"},status=status.HTTP_403_FORBIDDEN)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class RetrieveGroupApiView(generics.RetrieveAPIView):
     #permission_classes=[IsAuthenticated]
@@ -194,7 +227,7 @@ class RetrieveGroupApiView(generics.RetrieveAPIView):
             return Response(data, status=status.HTTP_200_OK)
         except:
             return Response({"error": "no result"}, status=status.HTTP_404_NOT_FOUND)
-        
+
 
 
 
@@ -209,13 +242,13 @@ class UpdateGroupApiView(generics.UpdateAPIView):
     def perform_update(self, serializer):
         user_id = self.request.user.id
         user = get_object_or_404(UserSocialAuth, user_id=user_id)
-        group = self.get_object()  
+        group = self.get_object()
         if group.admin == user:
             serializer.save()
             return Response({"message": "group updated successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "user can't be found."}, status=status.HTTP_401_UNAUTHORIZED)
-    
+
 class DeleteGroupApiView(generics.DestroyAPIView):
     #permission_classes=[IsAuthenticated]
     queryset = Group.objects.all()
@@ -225,14 +258,14 @@ class DeleteGroupApiView(generics.DestroyAPIView):
     def perform_destroy(self, instance):
         user_id = self.request.user.id
         user = get_object_or_404(UserSocialAuth, user_id=user_id)
-        group = self.get_object()  
+        group = self.get_object()
         if group.admin == user:
             super().perform_destroy(instance)
             return Response({"message": "group deleted successfully."}, status=status.HTTP_204_NO_CONTENT )
         else:
             return Response({"error": "user is not an admin."}, status=status.HTTP_401_UNAUTHORIZED)
 
-      
+
 class GetUserGroupsApiView(generics.ListAPIView):
     #permission_classes = [IsAuthenticated]
     serializer_class = Groupserializer
@@ -290,3 +323,92 @@ class GetUserDetailViews(APIView):
         user=get_object_or_404(CustomUser,email=email)
         serializer=UserSerializer(user)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+class AppearanceSetting(APIView):
+    #permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        request_body=AppearanceSerializer,
+        responses={200: 'Success', 400: 'Bad Request'},
+        operation_description="Save preferred appearance"
+    )
+    @action(detail=False, methods=['post'])
+    def post(self, request):
+        user_id = request.user.id
+        userSoc = UserSocialAuth.objects.get(user_id=user_id)
+        #userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+        print(userSoc)
+
+        user = CustomUser.objects.get(email=userSoc.uid)
+
+        
+        serializer = AppearanceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        appearance = serializer.validated_data['appearance']
+
+        # Update or create the user's appearance setting
+        preferences, created = Preferences.objects.get_or_create(user=user)
+        preferences.appearance = appearance
+        preferences.save()
+
+        return Response({'message': 'Appearance setting updated successfully'}, status=status.HTTP_200_OK)
+
+
+
+class LanguageRegionSettings(APIView):
+
+    #permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        request_body=LanguageRegionSerializer,
+        responses={200: 'Success', 400: 'Bad Request'},
+        operation_description="Save preferred appearance"
+    )
+    @action(detail=False, methods=['post'])
+    def post(self, request):
+            user_id = request.user.id
+            userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+            user = CustomUser.objects.get(email=userSoc.uid)
+
+            serializer = LanguageRegionSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            language = serializer.validated_data['language']
+            region = serializer.validated_data['region']
+
+            # Update or create the user's language and region settings
+            preferences, created = Preferences.objects.get_or_create(user=user)
+            preferences.language = language
+            preferences.region = region
+            preferences.save()
+
+            return Response({'message': 'Language and region settings updated successfully'}, status=status.HTTP_200_OK)
+        
+
+
+class SingleNotificationView(generics.RetrieveAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+    
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.is_read = True  # Mark the notification as read
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+class AllNotificationsView(generics.ListAPIView):
+    queryset = Notification.objects.all()
+    serializer_class = NotificationSerializer
+
+
+    def list(self, request, *args, **kwargs):
+        # Calculate the count of unread notifications
+        unread_count = Notification.objects.filter(is_read=False).count()
+        queryset = self.get_queryset()
+        serializer = self.get_serializer(queryset, many=True)
+        data = {
+            "notifications": serializer.data,
+            "unread_count": unread_count
+        }
+        return Response(data)
