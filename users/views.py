@@ -22,7 +22,8 @@ from comments.serializers import CommentpicSerializer
 from  .models import CustomUser
 from django.db.models import Q
 from django.core.files.base import ContentFile
-import json
+from django.http import JsonResponse
+
 
 class UserProfileView(APIView):
     """
@@ -159,13 +160,13 @@ class CreateGroupApiView(generics.ListCreateAPIView):
                 "group_name": instance.group_name,
                 "admin": instance.admin.username,
                 "image": instance.image.url,
-                "friends": [instance.friends],
+                "friends": instance.friends,
                 "created_at": instance.created_at,
                 "updated_at": instance.updated_at
             }
         print(response)
         
-        return Response(response, status=status.HTTP_201_CREATED)
+        return JsonResponse(response, status=status.HTTP_201_CREATED)
     # def post(self, request, *args, **kwargs):
     #     serializer = Groupserializer(data=request.data)
     #     if serializer.is_valid():
