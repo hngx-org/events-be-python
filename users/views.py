@@ -36,7 +36,7 @@ class UserProfileView(APIView):
         social_auth_provider: e.g google
         social_id: uidd associated with the user on the social_auth
         picture: profile picture of the user
-
+        
     """
     #permission_classes = (IsAuthenticated,)
 
@@ -71,7 +71,6 @@ class UserProfileView(APIView):
             else:
                 new_user = CustomUser(username=user.username, email=user.email, profile_picture=picture_url)
                 new_user.save()
-            print("ues")
 
             return Response(user_data, status=status.HTTP_200_OK)
 
@@ -93,7 +92,7 @@ class UserProfileView(APIView):
                 profile_picture = user_data.get('picture')
                 return profile_picture
             else:
-                return None
+                return None  
 
         except Exception as e:
             return None
@@ -135,7 +134,7 @@ class GoogleLoginView(APIView):
 
 
 class LogoutView(APIView):
-    """
+    """ 
         Get and revoke the session token to log user out.
     """
     #permission_classes = [IsAuthenticated]
@@ -143,7 +142,7 @@ class LogoutView(APIView):
         access_token = request.user.social_auth.get(provider='google-oauth2').extra_data['access_token']
         revoke_url = f'https://accounts.google.com/o/oauth2/revoke?token={access_token}'
         response = requests.get(revoke_url)
-
+        
         if response.status_code == 200 or response.status_code == 400:
             # Successfully logged out from Google or token is already invalid
             request.session.clear()
@@ -206,7 +205,7 @@ class AddFriendToGroup(generics.CreateAPIView):
                         return Response({"a user you are trying to add does not exist"},status=status.HTTP_404_NOT_FOUND)
                 return Response({"message":"friend have been Added successfully"},status=status.HTTP_201_CREATED)
             return Response({"detail":"you are not the admin of this group"},status=status.HTTP_403_FORBIDDEN)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)   
 
 class RetrieveGroupApiView(generics.RetrieveAPIView):
     #permission_classes=[IsAuthenticated]
@@ -227,7 +226,7 @@ class RetrieveGroupApiView(generics.RetrieveAPIView):
             return Response(data, status=status.HTTP_200_OK)
         except:
             return Response({"error": "no result"}, status=status.HTTP_404_NOT_FOUND)
-
+        
 
 
 
@@ -242,13 +241,13 @@ class UpdateGroupApiView(generics.UpdateAPIView):
     def perform_update(self, serializer):
         user_id = self.request.user.id
         user = get_object_or_404(UserSocialAuth, user_id=user_id)
-        group = self.get_object()
+        group = self.get_object()  
         if group.admin == user:
             serializer.save()
             return Response({"message": "group updated successfully."}, status=status.HTTP_200_OK)
         else:
             return Response({"error": "user can't be found."}, status=status.HTTP_401_UNAUTHORIZED)
-
+    
 class DeleteGroupApiView(generics.DestroyAPIView):
     #permission_classes=[IsAuthenticated]
     queryset = Group.objects.all()
@@ -258,14 +257,14 @@ class DeleteGroupApiView(generics.DestroyAPIView):
     def perform_destroy(self, instance):
         user_id = self.request.user.id
         user = get_object_or_404(UserSocialAuth, user_id=user_id)
-        group = self.get_object()
+        group = self.get_object()  
         if group.admin == user:
             super().perform_destroy(instance)
             return Response({"message": "group deleted successfully."}, status=status.HTTP_204_NO_CONTENT )
         else:
             return Response({"error": "user is not an admin."}, status=status.HTTP_401_UNAUTHORIZED)
 
-
+      
 class GetUserGroupsApiView(generics.ListAPIView):
     #permission_classes = [IsAuthenticated]
     serializer_class = Groupserializer
@@ -317,8 +316,6 @@ class GetUserDetailView(generics.RetrieveAPIView):
     lookup_field = 'email'
 
 class GetUserDetailViews(APIView):
-     # permission_classes= [AllowAny]
-    permission_classes= [AllowAny]
     def get(self,request,email):
         user=get_object_or_404(CustomUser,email=email)
         serializer=UserSerializer(user)
