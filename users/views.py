@@ -1,3 +1,5 @@
+import base64
+import uuid
 from django.shortcuts import render,redirect
 from django.urls import reverse
 from rest_framework import generics
@@ -19,6 +21,9 @@ from events.models import Events
 from comments.serializers import CommentpicSerializer
 from  .models import CustomUser
 from django.db.models import Q
+from django.core.files.base import ContentFile
+import json
+
 class UserProfileView(APIView):
     """
     Redirect user after signing in using SSO and return the following properties of the user as it is on social auth
@@ -125,24 +130,42 @@ class CreateGroupApiView(generics.ListCreateAPIView):
     queryset = Group.objects.all()
     serializer_class = Groupserializer
 
-    def perform_create(self, serializer):
+    def post(self,request):
+        serializer = self.serializer_class(data=request.data)
         user_id = self.request.user.id
         userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
         user = CustomUser.objects.get(email=userSoc.uid)
-        instance = serializer.save(admin=user)
-        instance.friends.add(user)
-        friend_emails = serializer.validated_data.pop('friend_emails')
-        print(friend_emails)
-        for email in friend_emails:
-            try:
-                friend = CustomUser.objects.get(email=email)
-                print(friend)
-                instance.friends.add(friend)
-                print("hi")
-                Ge = User_Groups.objects.create(group=instance, user=friend)
-            except user.DoesNotExist:
-                return Response({"a user you are trying to add does not exist"},status=status.HTTP_404_NOT_FOUND)
-
+        if serializer.is_valid():
+            group_name = serializer.validated_data.get('group_name')
+            instance = Group(admin=user,group_name=group_name)
+            base64_img = serializer.validated_data.pop('base64_img')
+            unique_id = str(uuid.uuid4())[:8]
+            c_title = f'group_img_{unique_id}'
+            img_data = base64.b64decode(base64_img)
+            f = ContentFile(img_data)
+            instance.image.save(f'{c_title}.jpg', f, save=True)
+            instance.friends.add(user)
+            friend_emails = serializer.validated_data.pop('friend_emails')
+            print(friend_emails)
+            for email in friend_emails:
+                try:
+                    friend = CustomUser.objects.get(email=email)
+                    instance.friends.add(friend)
+                    Ge = User_Groups.objects.create(group=instance, user=friend)
+                except user.DoesNotExist:
+                    return Response({"a user you are trying to add does not exist"},status=status.HTTP_404_NOT_FOUND)
+        response ={
+                "id": instance.pk,
+                "group_name": instance.group_name,
+                "admin": instance.admin.username,
+                "image": instance.image.url,
+                "friends": [instance.friends],
+                "created_at": instance.created_at,
+                "updated_at": instance.updated_at
+            }
+        print(response)
+        
+        return Response(response, status=status.HTTP_201_CREATED)
     # def post(self, request, *args, **kwargs):
     #     serializer = Groupserializer(data=request.data)
     #     if serializer.is_valid():
