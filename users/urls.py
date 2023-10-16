@@ -19,6 +19,8 @@ urlpatterns = [
     path('user_groups/detail',views.GetUserGroupDetail.as_view(),name='get_user_group_detail'),
     path('groups/add_friend/<int:group_id>/', views.AddFriendToGroup.as_view(), name='add_friend_to_group'),
     path('user/<str:email>/',views.GetUserDetailViews.as_view(),name='get_user_detail'),
+    path('settings/appearance/',views.AppearanceSetting.as_view(),name='set_appearance'),
+    path('settings/languageregion/',views.LanguageRegionSettings.as_view(),name='set_language'),
     path('notifications/<int:pk>/', views.SingleNotificationView.as_view(), name='single-notification'),
     path('notifications/', views.AllNotificationsView.as_view(), name='all-notifications'),
 

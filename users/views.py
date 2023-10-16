@@ -2,8 +2,8 @@ from django.shortcuts import render,redirect
 from django.urls import reverse
 from rest_framework import generics
 from rest_framework.response import Response
-from .serializers import AddFriendToGroupSerializer, Groupserializer
-from .models import Group, User_Groups
+from .serializers import AddFriendToGroupSerializer, Groupserializer, AppearanceSerializer, LanguageRegionSerializer
+from .models import Group, User_Groups, Preferences
 from authlib.integrations.django_client import OAuth
 from rest_framework import status
 from rest_framework.views import APIView
@@ -19,15 +19,13 @@ from events.models import Events
 from comments.serializers import CommentpicSerializer
 from  .models import CustomUser
 from django.db.models import Q
+from drf_yasg.utils import swagger_auto_schema
+from rest_framework.decorators import action
 from django.core.mail import send_mail
 from django.conf import settings
-import os
-import smtplib
 from django.utils import timezone
 from .models import Notification
 from .serializers import NotificationSerializer
-
-
 
 class UserProfileView(APIView):
     """
@@ -73,6 +71,7 @@ class UserProfileView(APIView):
             else:
                 new_user = CustomUser(username=user.username, email=user.email, profile_picture=picture_url)
                 new_user.save()
+            print("ues")
 
             return Response(user_data, status=status.HTTP_200_OK)
 
@@ -324,6 +323,67 @@ class GetUserDetailViews(APIView):
         user=get_object_or_404(CustomUser,email=email)
         serializer=UserSerializer(user)
         return Response(serializer.data,status=status.HTTP_200_OK)
+
+
+class AppearanceSetting(APIView):
+    #permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        request_body=AppearanceSerializer,
+        responses={200: 'Success', 400: 'Bad Request'},
+        operation_description="Save preferred appearance"
+    )
+    @action(detail=False, methods=['post'])
+    def post(self, request):
+        user_id = request.user.id
+        userSoc = UserSocialAuth.objects.get(user_id=user_id)
+        #userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+        print(userSoc)
+
+        user = CustomUser.objects.get(email=userSoc.uid)
+
+        
+        serializer = AppearanceSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        appearance = serializer.validated_data['appearance']
+
+        # Update or create the user's appearance setting
+        preferences, created = Preferences.objects.get_or_create(user=user)
+        preferences.appearance = appearance
+        preferences.save()
+
+        return Response({'message': 'Appearance setting updated successfully'}, status=status.HTTP_200_OK)
+
+
+
+class LanguageRegionSettings(APIView):
+
+    #permission_classes = [IsAuthenticated]
+    @swagger_auto_schema(
+        request_body=LanguageRegionSerializer,
+        responses={200: 'Success', 400: 'Bad Request'},
+        operation_description="Save preferred appearance"
+    )
+    @action(detail=False, methods=['post'])
+    def post(self, request):
+            user_id = request.user.id
+            userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
+            user = CustomUser.objects.get(email=userSoc.uid)
+
+            serializer = LanguageRegionSerializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+
+            language = serializer.validated_data['language']
+            region = serializer.validated_data['region']
+
+            # Update or create the user's language and region settings
+            preferences, created = Preferences.objects.get_or_create(user=user)
+            preferences.language = language
+            preferences.region = region
+            preferences.save()
+
+            return Response({'message': 'Language and region settings updated successfully'}, status=status.HTTP_200_OK)
+        
 
 
 class SingleNotificationView(generics.RetrieveAPIView):
