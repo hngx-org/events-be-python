@@ -1,5 +1,7 @@
 from django.contrib.auth.models import User, Group
 from rest_framework import serializers
+
+from users import validators
 from .models import Events, InterestinEvents
 from comments.models import Comment
 from users.models import Group
@@ -9,10 +11,22 @@ from social_django.models import UserSocialAuth
 
 class EventsSerializer(serializers.ModelSerializer):
     creator = serializers.UUIDField(read_only=True)
+    base64_img = serializers.CharField(
+        validators=[validators.validate_base64],
+        required=False
+        )
+    image = serializers.ImageField(required=False,read_only=True)
     class Meta:
         model = Events
-        fields = ['id','creator','title','description','location','start_date','group','end_date', 'start_time', 'end_time', 'image']
+        fields = ['id','creator','title','description','location','start_date','group','end_date', 'start_time', 'end_time', 'image','base64_img']
+    
+    def create(self, validated_data):
 
+       base64_img = validated_data.pop('base64_img')
+
+       events = Events.objects.create(**validated_data)
+
+       return events
 
 class GetEventsSerializer(serializers.ModelSerializer):
     creator = serializers.UUIDField(read_only=True)
