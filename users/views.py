@@ -180,7 +180,6 @@ class CreateGroupApiView(generics.ListCreateAPIView):
             instance.image.save(f'{c_title}.jpg', f, save=True)
             instance.friends.add(user)
             friend_emails = serializer.validated_data.pop('friend_emails')
-            print(friend_emails)
             for email in friend_emails:
                 try:
                     friend = CustomUser.objects.get(email=email)
