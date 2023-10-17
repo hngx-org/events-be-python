@@ -1,3 +1,5 @@
+import base64
+import uuid
 from django.urls import reverse
 from rest_framework import status, generics
 from rest_framework.generics import UpdateAPIView
@@ -15,6 +17,8 @@ from django.shortcuts import get_object_or_404
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from social_django.models import UserSocialAuth
 from users.models import CustomUser, Group
+from django.core.files.base import ContentFile
+
 
 
 class CreateEventView(generics.CreateAPIView):
@@ -35,10 +39,15 @@ class CreateEventView(generics.CreateAPIView):
 
             if group_id:
                 try:
-                    print(type(group_id))
                     user_group = Group.objects.get(id=group_id.pk)
-                    print(user_group)
-                    serializer.save(creator=user, group=group_id)
+                    instance = serializer.save(creator=user,group=group_id)
+                    base64_img = serializer.validated_data.pop('base64_img')
+                    unique_id = str(uuid.uuid4())[:8]
+                    c_title = f'event_img_{unique_id}'
+                    img_data = base64.b64decode(base64_img)
+                    f = ContentFile(img_data)
+                    instance.image.save(f'{c_title}.jpg', f, save=True)
+                   
                     return Response(serializer.data, status=status.HTTP_200_OK )
                 except User_Groups.DoesNotExist:
                     return Response(

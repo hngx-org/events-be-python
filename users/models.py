@@ -9,7 +9,6 @@ class CustomUser(models.Model):
     email = models.EmailField(unique=True)  # Ensure email is unique
     username = models.CharField(max_length=30, unique=True)  # Ensure username is unique
     profile_picture = models.ImageField(upload_to='profile_pictures/', null=True, blank=True)
-
     # Add any additional fields or methods you need for your custom user model
 
     def __str__(self):
