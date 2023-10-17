@@ -4,6 +4,8 @@ import uuid
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin, AbstractUser
 from social_django.models import UserSocialAuth
 from django.contrib.auth.models import AbstractUser
+from django.db.models.signals import post_save
+from django.dispatch import receiver
 
 class CustomUser(models.Model):
     email = models.EmailField(unique=True)  # Ensure email is unique
@@ -37,15 +39,17 @@ class User_Groups(models.Model):
     
     def __str__(self):
         return f"{self.group.group_name}"
+    
+    @receiver(post_save, sender=Group)
+    def create_user_groups(sender, instance, created, **kwargs):
+        if created:
+            user_group = User_Groups(group=instance, user=instance.admin)  # Assuming you want to associate the admin with the new group
+            user_group.save()
 
-        
-    def save(self, *args, **kwargs):
-        super(User_Groups, self).save(args, **kwargs)
-        if True:
-            message = f"{self.admin} has added you to {self.group.group_name}"
-        
-        Notification.objects.create(user=self.user, admin=self.group.admin, message=message)
-        return message
+            message = f"{user_group.group.admin} has added you to {user_group.group.group_name}"
+
+            Notification.objects.create(user=user_group.user, admin=user_group.group, message=message)
+
 
 class Notification(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE, )
