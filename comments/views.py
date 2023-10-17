@@ -100,6 +100,6 @@ class CommentListAPIView(generics.ListAPIView):
         except (Events.DoesNotExist, ValidationError):
             return Response({"detail": "Event ID is incorrect"}, status=404)
 
-        comments = CommentSerializer(self.queryset.filter(event_id=event_id),
+        comments = self.serializer_class(self.queryset.filter(event_id=event_id),
                                      many=True)
         return Response(comments.data)
