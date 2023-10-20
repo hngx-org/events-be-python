@@ -170,8 +170,8 @@ class CreateGroupApiView(generics.ListCreateAPIView):
         userSoc = get_object_or_404(UserSocialAuth, user_id=user_id)
         user = CustomUser.objects.get(email=userSoc.uid)
         if serializer.is_valid():
-            group_name = serializer.validated_data.get('group_name')
-            instance = serializer.save(admin=user,group_name=group_name)
+            # group_name = serializer.validated_data.get('group_name')
+            instance = serializer.save(admin=user)
             base64_img = serializer.validated_data.pop('base64_img')
             unique_id = str(uuid.uuid4())[:8]
             c_title = f'group_img_{unique_id}'
@@ -184,7 +184,7 @@ class CreateGroupApiView(generics.ListCreateAPIView):
                 try:
                     friend = CustomUser.objects.get(email=email)
                     instance.friends.add(friend)
-                    Ge = User_Groups.objects.create(group=instance, user=friend)
+                    # Ge = User_Groups.objects.create(group=instance, user=friend)
                 except user.DoesNotExist:
                     return Response({"a user you are trying to add does not exist"},status=status.HTTP_404_NOT_FOUND)
         response ={
